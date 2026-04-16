@@ -1,0 +1,162 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'treegrid/codebase/treegrid.css' %}">
+<style>
+	.vl {
+	  	border-left: 1px solid rgba(0,0,0,.1);
+	  	height: 50%;
+	  	position: absolute;
+	  	left: 50%;
+	  	margin-left: -9px;
+	  	top: 10;
+	  	background: #fff;
+	}
+
+</style>
+<script>
+    const project_id = {{ project_id|safe }};
+</script>
+
+<div class="row" style="padding-top:10px; padding-left:115px;">
+	<h5>Project name: {{ project_name }}</h5>
+</div>
+<section class="dhx_sample-controls d-flex justify-content-start" style="padding-top:5px; padding-left:100px;">
+	<a title="List View" href="/project-management/tree-grid-view/{{ project_id }}/"><button class="btn btn-sm btn-outline-success"><img src="/static/images/list-view-icon.png" height="20px"></button></a>
+	<a title="Gantt View" href="/project-management/gantt-chart-view/{{ project_id }}/"><button class="btn btn-sm btn-outline-warning ml-1"><img src="/static/images/gantt-view-icon.png" height="20px"></button></a>
+	<a title="Urgency Matrix View" href="/project-management/urgency-matrix-view/{{ project_id }}/"><button class="btn btn-sm btn-outline-danger ml-1"><img src="/static/images/urgency-matrix-icon.png" height="20px"></button></a>
+	<div class="dhx_form-group dhx_form-group--inline dhx_form-group--no-message-holder pl-2" id="duration-form-select" style="width:170px">
+		<label for="duration-select-id" class="dhx_label">Duration:</label>
+		<select name="duration-select-name" class="dhx_select dhx_input" id="duration-select-id">
+			<option value="0" selected>Today</option>
+			<option value="7">Next 7 days</option>
+			<option value="30">Next 30 days</option>
+		</select>
+	</div>
+</section>
+
+
+<!-- Urgency Matrix Table start -->
+<div class="container">
+	<div class="row">
+		<div class="col pt-3" id="urgency_matrix_error_msg"></div>
+	</div>
+	<div class="row pt-3">
+		<div class="col-sm-6">
+			<div class="row d-flex justify-content-between">
+				<h4 class="text-danger">1) Urgent and Important</h4>
+			  	<div class="pt-1" style="padding-left:9rem;">
+				  	<i style="color:grey" class="fas fa-search" aria-hidden="true"></i>
+			  	</div>
+			  	<div class="pb-2">
+				  	<input style="height:30px; width:120px; margin-right:15px" id="myInput1" type="text" class="form-control" onkeyup="mySearchFunction1()" placeholder="Filter Tasks..." title="Type in a task name" aria-controls="example">
+			  	</div>
+		  	</div>
+			<div style="height:200px; overflow:auto">
+				<table class="table table-bordered bg-danger text-white" id="urgent_and_important_table">
+					<thead>
+						<tr>
+						  <th>ID</th>
+						  <th>Task name</th>
+						</tr>
+					</thead>
+					<tbody id="urgent_and_important_tbody">
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="vl"></div>
+		<div class="col-sm-6">
+			<div class="row d-flex justify-content-between">
+				<h4 class="text-primary">2) Less Urgent but Important</h4>
+			  	<div class="pt-1" style="padding-left:6rem;">
+				  	<i style="color:grey" class="fas fa-search" aria-hidden="true"></i>
+			  	</div>
+			  	<div class="pb-2">
+				  	<input style="height:30px; width:120px; margin-right:15px" id="myInput2" type="text" class="form-control" onkeyup="mySearchFunction2()" placeholder="Filter Tasks..." title="Type in a task name" aria-controls="example">
+			  	</div>
+		  	</div>
+			<div style="height:200px; overflow:auto">
+				<table class="table table-bordered bg-primary text-white" id="less_urgent_but_important_table">
+					<thead>
+						<tr>
+						  <th>ID</th>
+						  <th>Task name</th>
+						</tr>
+					</thead>
+					<tbody id="less_urgent_but_important_tbody">
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="row d-flex justify-content-between">
+				<h4 class="text-success">3) Urgent but less Important</h4>
+			  	<div class="pt-1" style="padding-left:6rem;">
+				  	<i style="color:grey" class="fas fa-search" aria-hidden="true"></i>
+			  	</div>
+			  	<div class="pb-2">
+				  	<input style="height:30px; width:120px; margin-right:15px" id="myInput3" type="text" class="form-control" onkeyup="mySearchFunction3()" placeholder="Filter Tasks..." title="Type in a task name" aria-controls="example">
+			  	</div>
+		  	</div>
+			<div style="height:200px; overflow:auto">
+				<table class="table table-bordered bg-success text-white" id="urgent_but_less_important_table">
+					<thead>
+						<tr>
+						  <th>ID</th>
+						  <th>Task name</th>
+						</tr>
+					</thead>
+					<tbody id="urgent_but_less_important_tbody">
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="vl"></div>
+		<div class="col-sm-6">
+			<div class="row d-flex justify-content-between">
+				<h4 class="text-secondary">4) Neither Urgent nor Important</h4>
+			  	<div class="pt-1" style="padding-left:4rem;">
+				  	<i style="color:grey" class="fas fa-search" aria-hidden="true"></i>
+			  	</div>
+			  	<div class="pb-2">
+				  	<input style="height:30px; width:120px; margin-right:15px" id="myInput4" type="text" class="form-control" onkeyup="mySearchFunction4()" placeholder="Filter Tasks..." title="Type in a task name" aria-controls="example">
+			  	</div>
+		  	</div>
+			<div style="height:200px; overflow:auto">
+				<table class="table table-bordered bg-secondary text-white" id="neither_urgent_nor_important_table">
+					<thead>
+						<tr>
+						  <th>ID</th>
+						  <th>Task name</th>
+						</tr>
+					</thead>
+					<tbody id="neither_urgent_nor_important_tbody">
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<!-- Urgency Matrix Table end -->
+
+
+{% endblock %}
+{% block extracode %}
+	<script src="{% static 'project_management/js/urgency_matrix_view.js' %}?version=1" type="text/javascript"></script>
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

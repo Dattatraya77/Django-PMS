@@ -1,0 +1,136 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<style>
+    div.scroll {
+        margin:4px, 4px;
+        padding:4px;
+        background-color: steel;
+        max-height: 200px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align:justify;
+    }
+    .select2-container {
+        min-width: 445px;
+    }
+    .select2-results__options{
+        font-size:14px !important;
+    }
+    .select2-results__placeholders{
+        font-size:11px !important;
+    }
+    .select2-container--default.select2-container--disabled .select2-selection--multiple {
+        background-color: #d0ffd0;
+    }
+    label {
+        margin-bottom:0.2rem;
+    }
+</style>
+
+<div class="container">
+    <div class="d-flex justify-content-center">
+        <form action="{% url 'copy-library-project' %}" method="post" id="copyLibraryProjectForm">
+            {% csrf_token %}
+            <div class="modal fade" id="copyLibraryProjectModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="copyLibraryProjectModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="copyLibraryProjectModalTitle">Project details</h5>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                    {% if projects %}
+                                        <label class="">Library project(s):</label>
+                                        <div class="scroll form-group">
+                                            <select required class="library-project-select" name="library_project_select" id="library_project_select">
+                                                <option id="-1" value="">Click here to select options.</option>
+                                                {% for project in projects %}
+                                                    <option value="{{ project.proj_id }}" class="form-control">{{ project.proj_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div id="libraryProjectNameError"></div>
+                                        </div>
+                                    {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="projectName">Project name:</label>
+                                        <input placeholder="Project name..." type="text" id="projectName" name="projectName" class="form-control" required>
+                                        <div id="projectNameError"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="projectDescription">Project description:</label>
+                                        <textarea placeholder="Project description..." name="projectDescription" id="projectDescription" cols="30" rows="5" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" id="copy_library_project_group">
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="copyValuesCheckbox" value="with_values" checked>
+                                        <label class="form-check-label text-success" id="copyValuesLabel" for="copyValuesCheckbox">
+                                            Copy project with values
+                                        </label>
+                                    </div>
+                                    <br>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="button" onclick="copyLibraryProject()" class="btn btn-block btn-md btn-primary">Save</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="button" onclick="location.href='/project-management/create-new-project/'; loader('show');" class="btn btn-block btn-md btn-secondary" title="Back to create project">Cancel</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+{% block extracode %}
+    <script>
+    $(document).ready(function() {
+        $("#copyLibraryProjectModal").modal("show");
+
+        $(".library-project-select").select2({
+            placeholder: "Click here to select options.",
+            closeOnSelect: true,
+            tags: false,
+            allowClear: true,
+            multiple: false,
+        });
+    });
+
+</script>
+    <script src="{% static 'project_management/js/copy_library_project.js' %}?version=1" type="text/javascript"></script>
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

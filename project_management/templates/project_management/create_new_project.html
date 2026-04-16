@@ -1,0 +1,111 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<style>
+    .item{
+        padding-left:5px;
+        padding-right:5px;
+    }
+    .item-card{
+        transition:0.5s;
+        cursor:pointer;
+    }
+    .item-card-title{
+        font-size:15px;
+        transition:1s;
+        cursor:pointer;
+    }
+    .item-card-title i{
+        font-size:15px;
+        transition:1s;
+        cursor:pointer;
+        color:#ffa710
+    }
+    .card-title i:hover{
+        transform: scale(1.25) rotate(100deg);
+        color:#18d4ca;
+    }
+    .card:hover{
+        transform: scale(1.05);
+        box-shadow: 10px 10px 15px rgba(0,0,0,0.3);
+    }
+    
+    .card::before, .card::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        transform: scale3d(0, 0, 1);
+        transition: transform .3s ease-out 0s;
+        background: rgba(255, 255, 255, 0.1);
+        content: '';
+        pointer-events: none;
+    }
+    .card::before {
+        transform-origin: left top;
+    }
+    .card::after {
+        transform-origin: right bottom;
+    }
+    .card:hover::before, .card:hover::after, .card:focus::before, .card:focus::after {
+        transform: scale3d(1, 1, 1);
+    }
+    .col-md-2 {
+        max-width:13.666666%;
+    }
+
+</style>
+
+<div class="container">
+    <div class="row d-flex justify-content-center">
+        <h3 class="pt-5 text-secondary">Create a new project</h3>
+    </div>
+    <div class="row d-flex justify-content-center">
+        <p class="pt-2 text-secondary">How would you like to start?</p>
+    </div>
+    <div class="py-5 row d-flex justify-content-center">
+        <div class="col-md-2 d-flex justify-content-center item" onclick="location.href='/project-management/blank-project/'">
+            <div class="card item-card card-block" style="border-radius: 20px; width: 9rem; height:9rem; border:dotted; border-color:lightgrey;">
+                <i class="pt-3 text-center text-info fas fa-plus fa-4x"></i>
+                <h6 class="card-title  mt-2 mb-2 text-center text-secondary" style="font-size:14px;">Blank project</h6>
+                <p class="text-center text-secondary" style="font-size:13px;">Start from scratch</p>
+            </div>
+        </div>
+        <div class="col-md-2 d-flex justify-content-center item" onclick="location.href='/project-management/use-template/'">
+            <div class="card item-card card-block" style="border-radius: 20px; width: 9rem; height:9rem;">
+                <i class="pt-3 text-center text-primary fas fa-tasks fa-4x"></i>
+                <h6 class="card-title  mt-2 mb-2 text-center text-secondary" style="font-size:14px;">Use a template</h6>
+                <p class="text-center text-secondary" style="font-size:13px;">Choose from library</p>
+            </div>
+        </div>
+        <div class="col-md-2 d-flex justify-content-center item" onclick="location.href='/project-management/import-csv-file/'">
+            <div class="card item-card card-block" style="border-radius: 20px; width: 9rem; height:9rem;">
+                <i class="pt-3 text-center text-success fas fa-file-csv fa-4x"></i>
+                <h6 class="card-title  mt-2 mb-2 text-center text-secondary" style="font-size:14px;">Import spreadsheet</h6>
+                <p class="text-center text-secondary" style="font-size:13px;">Add from another tool</p>
+            </div>
+        </div>
+        <div class="col-md-2 d-flex justify-content-center item" onclick="location.href='/project-management/copy-library-project/'; loader('show');">
+            <div class="card item-card card-block" style="border-radius: 20px; width: 9rem; height:9rem;">
+                <i class="pt-3 text-center text-secondary fas fa-copy fa-4x"></i>
+                <h6 class="card-title  mt-2 mb-2 text-center text-secondary" style="font-size:14px;">Copy project</h6>
+                <p class="text-center text-secondary" style="font-size:13px;">Choose from library</p>
+            </div>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-center">
+        <a onclick="loader('show')" title="Go to project dashboard" href="/project-management/project-card-view/"><button class="btn btn-outline-secondary"><i class="fas fa-arrow-circle-left"></i> Projects Dashboard</button></a>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block extracode %}
+
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

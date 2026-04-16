@@ -1,0 +1,129 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<style>
+    div.scroll {
+        margin:4px, 4px;
+        padding:4px;
+        background-color: steel;
+        max-height: 200px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align:justify;
+    }
+    .select2-container {
+        min-width: 460px;
+    }
+    .select2-results__options{
+        font-size:14px !important;
+    }
+    .select2-results__placeholders{
+        font-size:11px !important;
+    }
+    .select2-container--default.select2-container--disabled .select2-selection--multiple {
+        background-color: #d0ffd0;
+    }
+</style>
+
+<div class="container">
+    <div class="d-flex justify-content-center">
+        <form action="#" method="post" id="importCSVFileForm">
+            {% csrf_token %}
+            <div class="modal fade" id="importCSVFileModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="importCSVFileModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="importCSVFileModalTitle">Project details</h5>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="project_name">Project name:</label>
+                                        <input type="text" id="project_name" name="project_name" class="form-control" required>
+                                    </div>
+                                    <div id="projectNameErr"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="project_description">Project description:</label>
+                                        <textarea name="project_description" id="project_description" cols="30" rows="5" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                    {% if proj_groups %}
+                                        <label class="">Project groups:</label>
+                                        <div class="scroll form-group">
+                                            <select multiple class="import-csv-file-group-select" name="import_csv_file_group_select">
+                                                {% for group in proj_groups %}
+                                                    <option value="{{ group.name }}" class="form-control">{{ group.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button id="select_file_btn" type="submit" class="btn btn-block btn-md btn-primary" disabled>Select file to import</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="button" onclick="location.href='/project-management/create-new-project/'" class="btn btn-block btn-md btn-secondary" title="Back to create project">Cancel</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+{% block extracode %}
+<script>
+    $(document).ready(function() {
+        $("#importCSVFileModal").modal("show");
+
+        $(".import-csv-file-group-select").select2({
+            placeholder: "Click here to select options.",
+            closeOnSelect: true,
+            tags: false,
+            allowClear: true,
+            multiple: true,
+            tokenSeparators: ['/',',',';'," "],
+        });
+    });
+
+    $("#project_name").on('input',function(e) {
+        var proj_name = $(this).val();
+        console.log("proj_name:->",proj_name);
+        if(proj_name.length != 0){
+            $("#projectNameErr").html('');
+            $("#select_file_btn").removeAttr('disabled');
+        }
+        else {
+            $("#select_file_btn").attr('disabled', true);
+            $("#projectNameErr").html('<span class="text-danger">Please enter project name.</span>');
+        }
+
+    });
+
+</script>
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

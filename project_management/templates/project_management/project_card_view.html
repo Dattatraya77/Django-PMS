@@ -1,0 +1,462 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<style>
+    .card-body {
+        padding:0.5rem;
+    }
+    .item-card{
+        transition:0.5s;
+        cursor:pointer;
+    }
+    .item-card-title{
+        font-size:15px;
+        transition:1s;
+        cursor:pointer;
+    }
+    .item-card-title i{
+        font-size:15px;
+        transition:1s;
+        cursor:pointer;
+        color:#ffa710
+    }
+    .card-title i:hover{
+        transform: scale(1.25) rotate(100deg);
+        color:#18d4ca;
+    }
+    .card:hover{
+        transform: scale(1.05);
+        box-shadow: 10px 10px 15px rgba(0,0,0,0.3);
+    }
+
+    .card::before, .card::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        transform: scale3d(0, 0, 1);
+        transition: transform .3s ease-out 0s;
+        background: rgba(255, 255, 255, 0.1);
+        content: '';
+        pointer-events: none;
+    }
+    .card::before {
+        transform-origin: left top;
+    }
+    .card::after {
+        transform-origin: right bottom;
+    }
+    .card:hover::before, .card:hover::after, .card:focus::before, .card:focus::after {
+        transform: scale3d(1, 1, 1);
+    }
+    .select2-container {
+        min-width: 420px;
+    }
+    .select2-results__options{
+        font-size:14px !important;
+    }
+    .select2-results__placeholders{
+        font-size:11px !important;
+    }
+    .select2-container--default.select2-container--disabled .select2-selection--multiple {
+        background-color: #d0ffd0;
+    }
+    a, a:hover, a:focus, a:active {
+        text-decoration: none;
+        color: inherit;
+    }
+    .swal2-popup-custom {
+        width: 25em !important;
+        padding: 0.25em !important;
+        font-size: 0.9rem !important;
+    }
+    .swal2-icon.swal2-error {
+        border-color: #dc3545 !important;
+        color: #dc3545 !important;
+    }
+    .swal2-styled.swal2-cancel {
+        border-radius: 1.25em !important;
+        font-size: 1em !important!;
+    }
+    .swal2-styled.swal2-confirm {
+        border-radius: 1.25em !important;
+        font-size: 1em !important!;
+    }
+    .swal2-popup {
+        width:21em;
+    }
+</style>
+<style>
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 0px !important;
+    }
+    .buttons-html5 {
+        padding:1px 6px !important;
+    }
+    .btn-sm{
+        padding:0.25rem -0.5rem;
+        line-height:0.5;
+        border-radius:0rem;
+        font-size: 13px;
+    }
+    .dropdown-menu {
+        min-width:0rem;
+        padding:0.3rem 2px;
+        margin:0.125rem -200px 0px;
+        height: 200px;
+        overflow: auto;
+    }
+    sub {
+        bottom : 0.1em;
+    }
+    .dropdown-divider {
+        margin:0rem;
+    }
+    table#projectLogHistoryTable {
+        display:inline-table !important;
+    }
+</style>
+
+<script>
+    let project_list = {{ project_list|safe }};
+</script>
+
+<div class="container">
+    <div class="row" style="padding-top:20px; padding-left:15px;">
+        <a onclick="loader('show')" title="Click here to view project dashboard" href="/project-management/project-card-view/"><button class="active btn btn-outline-primary">Projects Dashboard <i class="fas fa-angle-double-down"></i></button></a>
+        <a onclick="loader('show')" title="Click here to create project" class="pl-2" href="{% url 'create-new-project' %}"><button class="btn btn-outline-primary">Create Project</button></a>
+        <a onclick="loader('show')" title="Click here to view deleted projects" class="pl-2" href="/project-management/projects-deleted/"><button class="btn btn-outline-primary">Deleted Projects</button></a>
+        <a onclick="loader('show')" title="Click here to view archived projects" class="pl-2" href="/project-management/projects-archive/"><button class="btn btn-outline-primary">Archived Projects</button></a>
+        <a onclick="loader('show')" title="Click here to view deleted tasks" class="pl-2" href="/project-management/deleted-tasks/"><button class="btn btn-outline-primary">Deleted Tasks</button></a>
+        {% if user.is_staff or user.is_superuser or user.username == 'vspladmin' %}
+            <a onclick="loader('show')" title="Click here to Manage Section Master" class="pl-2" href="/project-management/manage-section-master/"><button class="btn btn-outline-primary">Manage Section Master</button></a>
+        {% endif %}
+    </div>
+    <hr class="mb-4">
+    <div class="row" id="projectCardView">
+
+    </div>
+    {% if not project_list %}
+        <h3 class="d-flex justify-content-center text-danger">You do not have any active projects yet!</h3>
+    {% endif %}
+    <hr class="mt-2">
+    <div class="d-flex justify-content-center ">
+        <div class="user_card" style="width:150vw;">
+            <div class="d-flex justify-content-left">
+                <h5 id="form-title">All Project List</h5>
+            </div>
+            <div class="d-flex justify-content-center form_container">
+                <div class="table-responsive" style="height:700px">
+                    <table id="example" class="table table-bordered table-striped" data-order='[[ 0, "desc" ]]'>
+                        <thead>
+                            <tr align="center">
+                            <th>Project ID</th>
+                            <th>Project Name</th>
+                            <th>Project Groups</th>
+                            <th>Created By</th>
+                            <th>Status</th>
+                            <th>Start Date</th>
+                            <th>Due Date</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in project_obj_list %}
+                            <tr>
+                                <td>{{ item.proj_id }}</td>
+                                <td style ="word-break:break-all;">{{ item.proj_name }}</td>
+                                <td>{{ item.proj_doc_display_group }}</td>
+                                <td>{{ item.proj_owner.username }}</td>
+                                {% if item.proj_status.proj_status == 'Completed' %}
+                                    <td class="text-success"><i class="fas fa-check-circle pr-1"></i>{{ item.proj_status.proj_status }}</td>
+                                {% elif item.proj_status.proj_status == 'In Progress' %}
+                                    <td class="text-primary"><i class="fas fa-spinner pr-1"></i>{{ item.proj_status.proj_status }}</td>
+                                {% elif item.proj_status.proj_status == 'Not Started' %}
+                                    <td class="text-warning"><i class="fas fa-times-circle pr-1"></i>{{ item.proj_status.proj_status }}</td>
+                                {% elif item.proj_status.proj_status == 'On Hold' %}
+                                    <td class="text-danger"><i class="fas fa-exclamation-circle pr-1"></i>{{ item.proj_status.proj_status }}</td>
+                                {% else %}
+                                    <td class="text-secondary"><i class="fas fa-thumbs-down pr-1"></i>{{ item.proj_status.proj_status }}</td>
+                                {% endif %}
+                                <td>{{ item.proj_start_date | timezone:time_zone}}</td>
+                                <td>{{ item.proj_end_date | timezone:time_zone}}</td>
+                                <td align="center">
+                                    <div class="btn-group dropleft" role="group" aria-label="First group">
+                                        <a type="button" title="View project task" class="btn btn-outline-secondary btn-sm"
+                                                href="/project-management/tree-grid-view/{{ item.proj_id }}/">
+                                            <img src="/static/images/view-task.png" width="20" height="20"/>
+                                        </a>
+                                        <button type="button" title="Update project" class="btn btn-outline-secondary btn-sm"
+                                                onclick="updateProjectCardView('{{ item.proj_id }}')">
+                                            <img src="/static/images/edit-metadata.png" width="20" height="20"/>
+                                        </button>
+
+                                        <button title="More Action" class="btn btn-outline-secondary btn-sm dropbtn" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-content">
+                                            <a href="#" class="dropdown-item">
+                                                <button title="Delete project" type="button" class="btn btn-sm" onclick="deleteProjectCardView('{{ item.proj_id }}')">
+                                                    <i class="fa fa-trash text-danger"></i><span class="pl-2"><sub>Delete</sub></span>
+                                                </button>
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a href="#" class="dropdown-item">
+                                                <button title="Move to archive" type="button" class="btn btn-sm" onclick="moveToArchive('{{ item.proj_id }}')">
+                                                    <i class="fa fa-archive text-secondary"></i><span class="pl-2"><sub>Archive</sub></span>
+                                                </button>
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a href="#" class="dropdown-item">
+                                                <button title="Copy Project" type="button" class="btn btn-sm" onclick="copyProject('{{ item.proj_id }}')">
+                                                    <i class="fa fa-copy text-secondary"></i><span class="pl-2"><sub>Copy Project</sub></span>
+                                                </button>
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a href="#" class="dropdown-item">
+                                                <button title="Project Log History" type="button" class="btn btn-sm" onclick="getProjectLogHistory('{{ item.proj_id }}')">
+                                                    <i class="fas fa-hospital-symbol text-secondary"></i><span class="pl-2"><sub>Project Log History</sub></span>
+                                                </button>
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a href="#" class="dropdown-item">
+                                                <button title="Export to xlsx file" type="button" class="btn btn-sm open-export-modal" data-toggle="modal" data-target="#exportModal" data-proj-id="{{ item.proj_id }}">
+                                                    <i class="fas fa-download text-secondary"></i>
+                                                    <span class="pl-2"><sub>Export to xlsx/pdf file</sub></span>
+                                                </button>
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            {% if user.is_superuser or user.is_staff %}
+                                                <a href="#" class="dropdown-item">
+                                                    <button id="lock-btn-{{ item.proj_id }}"
+                                                            data-proj-id="{{ item.proj_id }}"
+                                                            class="btn btn-sm toggle-lock-btn"
+                                                            title="Click here to {% if item.proj_lock %}unlock{% else %}lock{% endif %} project">
+                                                        <i class="{% if item.proj_lock %}fas fa-unlock text-success{% else %}fas fa-lock text-danger{% endif %}"></i>
+                                                        <span class="pl-2">
+                                                            <sub>{% if item.proj_lock %}Unlock Me{% else %}Lock Me{% endif %}</sub>
+                                                        </span>
+                                                    </button>
+                                                </a>
+                                                <div class="dropdown-divider"></div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--update project card model-->
+    <div class="modal fade" id="updateProjectCardModal" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="updateProjectCardTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateProjectCardTitle">Update Project</h5>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <h4 class="text-center alert-primary">
+                                    Update Existing Project
+                                </h4>
+
+                                <form method="POST" enctype="multipart/form-data" id="update_project_card_form">
+                                    {% csrf_token %}
+                                    <div id="update_project_card_div">
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  Modal for project log history-->
+    <div class="modal fade" id="projectLogHistoryModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="projectLogHistoryTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="projectLogHistoryTitle">Project History</h5>
+                    <button id="close_project_log_history" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <h4 class="text-center alert-primary">
+                            Project log history details
+                        </h4>
+                        <div class="d-flex justify-content-center">
+                            <div class="table-responsive" style="min-height:400px">
+                                <table id="projectLogHistoryTable" class="table table-bordered table-striped" data-order='[[ 0, "desc" ]]' style="min-width:1050px;">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%">Log ID</th>
+                                            <th width="10%">Project ID</th>
+                                            <th>Log Message</th>
+                                            <th width="15%">Created By</th>
+                                            <th width="15%">Date</th>
+                                            <th width="16%">Project Log Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">
+                    <i class="fas fa-download text-primary mr-2"></i> Export Options
+                    </h5>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="export_proj_id" />
+
+                    <!-- Excel Export Section -->
+                    <div class="mb-4">
+                        <label class="font-weight-bold">Export to Excel (.xlsx)</label>
+                        <div class="d-flex flex-column gap-2">
+                            <button title="Click here to export data into excel file" type="button" class="btn btn-outline-primary text-left mb-2 px-3 py-2" onclick="exportExcelToSingleSheet()">
+                                <i class="far fa-file-excel text-success mr-2"></i> Exports all tasks into one Excel sheet
+                            </button>
+<!--                            <button type="button" class="btn btn-outline-primary text-left mb-2 px-3 py-2" onclick="exportExcelToGroupedHierarchy()">-->
+<!--                                <i class="far fa-file-excel text-success mr-2"></i> Exports child tasks underneath their parent in the same Excel sheet-->
+<!--                            </button>-->
+<!--                            <button type="button" class="btn btn-outline-primary text-left px-3 py-2" onclick="exportExcelToSeparateSheets()">-->
+<!--                                <i class="far fa-file-excel text-success mr-2"></i> Exports each task (parent or child) into its own Excel sheet-->
+<!--                            </button>-->
+                        </div>
+                    </div>
+
+                    <!-- PDF Export Section -->
+                    <div class="mb-3">
+                        <label for="pdfExportOption" class="font-weight-bold">Export to PDF(.pdf)</label>
+                        <select class="form-control mb-3" id="pdfExportOption">
+                            <option value="portrait" selected>Exports all tasks into portrait mode</option>
+                            <option value="landscape">Exports all tasks into landscape mode</option>
+                        </select>
+                        <button title="Click here to export data into pdf file" type="button" class="btn btn-outline-primary px-3 py-2" onclick="downloadPDF()">
+                            <i class="far fa-file-pdf text-danger mr-2"></i> Export to PDF file
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<div class="container">
+    <div class="d-flex justify-content-center">
+        <form action="{% url 'copy-library-project' %}" method="post" id="copyLibraryProjectForm">
+            {% csrf_token %}
+            <div class="modal fade" id="copyLibraryProjectModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="copyLibraryProjectModalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="copyLibraryProjectModalTitle">Project details</h5>
+                        </div>
+                        <div class="modal-body">
+
+                            <input type="hidden" name="copy_project_id" id="copy_project_id">
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="projectName">Project name:</label>
+                                        <input placeholder="Project name..." type="text" id="projectName" name="projectName" class="form-control" required>
+                                        <div id="projectNameError"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label for="projectDescription">Project description:</label>
+                                        <textarea placeholder="Project description..." name="projectDescription" id="projectDescription" cols="30" rows="5" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" id="copy_library_project_group">
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="copyValuesCheckbox" value="with_values" checked>
+                                        <label class="form-check-label text-success" id="copyValuesLabel" for="copyValuesCheckbox">
+                                            Copy project with values
+                                        </label>
+                                    </div>
+                                    <br>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="button" onclick="copyLibraryProject()" class="btn btn-block btn-md btn-primary">Save</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="button" onclick="location.href='/project-management/project-card-view/'; loader('show');" class="btn btn-block btn-md btn-secondary" title="Back to project dashboard">Cancel</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extracode %}
+    <script type="text/javascript">
+            var user_is_admin = {{ user_is_superuser_or_staff|yesno:"true,false" }};
+    </script>
+    <script src="{% static 'project_management/js/project_card_view.js' %}?version=1" type="text/javascript"></script>
+    <script src="{% static 'project_management/js/copy_project.js' %}?version=1" type="text/javascript"></script>
+    <script src="{% static 'project_management/js/project_log_history.js' %}?version=1" type="text/javascript"></script>
+    <script src="{% static 'project_management/js/export_to_xlsx_or_pdf_file.js' %}?version=1" type="text/javascript"></script>
+
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

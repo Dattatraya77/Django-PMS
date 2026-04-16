@@ -1,0 +1,447 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+
+<style>
+    .select2-container .select2-selection--single {
+        height: 35px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 32px;
+    }
+    #choiceList li {
+        padding: 4px 10px !important;
+        font-size: 14px;
+        line-height: 1.4;
+        border-radius: 6px;
+        margin-bottom: 6px;
+        background-color: #f8f9fa;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    #choiceList li .remove-choice {
+        font-size: 12px;
+        padding: 2px 6px;
+        line-height: 1;
+    }
+
+    /* Optional: smooth scrollbar */
+    .border::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .border::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 4px;
+    }
+
+    .border::-webkit-scrollbar-track {
+        background-color: #f1f1f1;
+    }
+    #existingChoicesList li {
+        padding: 4px 10px !important;
+        font-size: 14px;
+        margin-bottom: 4px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease;
+    }
+
+    #existingChoicesList li:hover {
+        background-color: #e2e6ea;
+    }
+
+    #existingChoicesList .btn-danger {
+        padding: 2px 8px;
+        font-size: 12px;
+        line-height: 1.2;
+    }
+    .swal2-popup-custom {
+        width: 25em !important;
+        padding: 0.25em !important;
+        font-size: 0.9rem !important;
+    }
+    .swal2-icon.swal2-error {
+        border-color: #dc3545 !important;
+        color: #dc3545 !important;
+    }
+    .swal2-styled.swal2-cancel {
+        border-radius: 1.25em !important;
+        font-size: 1em !important!;
+    }
+    .swal2-styled.swal2-confirm {
+        border-radius: 1.25em !important;
+        font-size: 1em !important!;
+    }
+    .swal2-popup {
+        width:21em;
+    }
+    .table-sm-custom td {
+        padding-top: 0.4rem;
+        padding-bottom: 0.3rem;
+        font-size: 0.775rem;
+        line-height: 2.2;
+    }
+    .select2 select2-container select2-container--default select2-container--below select2-container--focus {
+        width:520px;
+    }
+</style>
+<style>
+    .buttons-html5 {
+        padding:1px 6px !important;
+    }
+</style>
+<style>
+    .styled-table-container {
+        max-height: 140px; /* Control vertical scroll height */
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 0.4rem;
+        background: white;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 0.35rem 0.5rem;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .styled-table thead {
+        background-color: #f1f3f5;
+        font-weight: bold;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .styled-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .styled-table tbody tr:hover {
+        background-color: aquamarine;
+    }
+
+    .btn-xs {
+        padding: 0.2rem 0.45rem;
+        font-size: 12px;
+        line-height: 1.2;
+        border-radius: 0.2rem;
+    }
+</style>
+
+<div class="container">
+    <div class="row" style="padding-top:20px; padding-left:15px;">
+        <a onclick="loader('show')" title="Click here to view project dashboard" href="/project-management/project-card-view/"><button class="btn btn-outline-primary">Projects Dashboard</button></a>
+        <a onclick="loader('show')" title="Click here to create project" class="pl-2" href="{% url 'create-new-project' %}"><button class="btn btn-outline-primary">Create Project</button></a>
+        <a onclick="loader('show')" title="Click here to view deleted projects" class="pl-2" href="/project-management/projects-deleted/"><button class="btn btn-outline-primary">Deleted Projects</button></a>
+        <a onclick="loader('show')" title="Click here to view archived projects" class="pl-2" href="/project-management/projects-archive/"><button class="btn btn-outline-primary">Archived Projects</button></a>
+        <a onclick="loader('show')" title="Click here to view deleted tasks" class="pl-2" href="/project-management/deleted-tasks/"><button class="btn btn-outline-primary">Deleted Tasks</button></a>
+        {% if user.is_staff or user.is_superuser or user.username == 'vspladmin' %}
+            <a onclick="loader('show')" title="Click here to Manage Section Master" class="pl-2" href="/project-management/manage-section-master/"><button class="active btn btn-outline-primary">Manage Section Master <i class="fas fa-angle-double-down"></i></button></a>
+        {% endif %}
+    </div>
+    <hr>
+	<div class="d-flex justify-content-center">
+        <div class="user_card border p-3" style="width:150vw;">
+            <div class="d-flex justify-content-between">
+                <h5 id="form-title">Create Section Master</h5>
+                <!-- Manage Special Character Button -->
+                <a onclick="loader('show');" title="Click here to Manage Special Character" href="#" data-toggle="modal" data-target="#specialCharModal">
+                  <button class="btn btn-outline-primary">
+                    <i class="fas fa-circle"></i> Manage Special Character
+                  </button>
+                </a>
+            </div>
+            <h6 class="text-warning">Note: (*) means required field</h6>
+            <div class="row">
+                {% csrf_token %}
+                <div class="col-md-3">
+                    <strong><label class="mb-3"><span class="text-warning">* </span>Section Master Name:</label></strong>
+                    <select id="sectionMasterName" class="form-control section-master-name-select">
+                        <option id="1" value="">Click here to select options.</option>
+                        {% for section_master_name in names %}
+                            <option value="{{ section_master_name }}">{{ section_master_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-danger pl-3" id="sectionMasterNameError"></small>
+                </div>
+                <div class="col-md-3">
+                    <strong><label>Section Sub Metadata: <button disabled type="button" class="btn btn-sm btn-primary" id="add_sub_choices" name="add_sub_choices">Add</button></label></strong>
+                    <input placeholder="Section sub metadata name." disabled type="text" class="form-control" id="section_sub_metadata_name" name="section_sub_metadata_name">
+                </div>
+                <div class="col-md-3">
+                    <strong><label class="mb-3">Section Sub Choices:</label></strong>
+                    <input placeholder="Section sub choice name." disabled type="text" class="form-control" id="section_sub_choice" name="section_sub_choice">
+                </div>
+                <div class="col-md-3">
+                    <strong><label class="mb-3"><span class="text-warning">* </span>Section Master Metadata:</label></strong>
+                    <select id="sectionMasterMetadataName" class="form-control section-master-metadata-name-select">
+                        <option id="2" value="">Click here to select options.</option>
+                        {% for section_master_metadata_name in fields %}
+                            <option value="{{ section_master_metadata_name }}">{{ section_master_metadata_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-danger" id="sectionMasterMetadataNameError"></small>
+                </div>
+            </div>
+
+            <!-- Message block (initially hidden) -->
+            <div id="existingChoicesMessage" class="py-2 px-3 d-flex justify-content-between align-items-center" style="display: none;">
+                <span id="existingChoicesText" class="mb-0 text-warning" style="font-size: 14px;"></span>
+            </div>
+
+            <div class="styled-table-container mt-2">
+                <table hidden class="table table-sm table-bordered styled-table styled-table-hover styled-table-striped w-100">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th>Section Master Name</th>
+                            <th>Section Sub Metadata</th>
+                            <th>Section Sub Choice</th>
+                            <th>Section Master Metadata</th>
+                            <th style="width: 90px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="existingChoicesTableBody">
+                        <!-- Dynamically inserted rows -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4" id="add_choice_div_id">
+                <strong><label>Add Choices:</label></strong>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <button title="Click here to create choice" class="btn btn-primary" type="button" id="createChoiceBtn"><i class="fas fa-plus-circle"></i> Create Choice</button>
+                    </div>
+                    <div class="col-md-10">
+                        <input type="text" id="choiceInput" class="form-control" placeholder="Please enter your choice">
+                        <small class="text-danger pl-3" id="choiceInputError"></small>
+                    </div>
+
+                </div>
+
+                <div class="border rounded p-2 bg-white" style="height: 117px; overflow-y: auto;">
+                    <ul class="list-group" id="choiceList" style="margin: 0;"></ul>
+                </div>
+            </div>
+            <div class="mt-4 text-end">
+                <button title="Click here to save data" class="btn btn-success" type="button" id="submitSectionMaster">Submit</button>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <h5 class="text-dark mb-0">Section Master List</h5>
+                <input style="width:10rem; height:30px;" type="text" id="searchInput" class="form-control" placeholder="🔍 Filter records">
+            </div>
+            <div class="">
+                <table class="table table-bordered table-striped table-hover table-sm-custom mb-5">
+                    <thead class="bg-light text-dark">
+                        <tr>
+                            <th width="60">ID</th>
+                            <th>Section Master Name</th>
+                            <th>Section Sub Metadata</th>
+                            <th>Section Sub Choice</th>
+                            <th width="250">Section Master Metadata</th>
+                            <th width="115">Status</th>
+                            <th width="100">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sectionMasterTableBody">
+                        <!-- Section Master rows will be inserted here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Update Section Master Modal -->
+<div class="modal fade" id="updateSectionMasterModal" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Update Section Master Choices</h5>
+                <button onclick="window.location.reload(); loader('show');" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6 class="modal-title pb-3 text-info" id="update_section_master_choice_header"></h6>
+                <div class="row mb-3">
+                    <div class="col-md-9">
+                        <input style="width: 630px;" type="text" id="newChoiceInput" class="form-control mr-2" placeholder="Enter your new choice here...">
+                    </div>
+                    <div class="col-md-3">
+                        <button title="Click here to add new choice" style="margin-left: 40px;" class="btn btn-success" id="addChoiceBtn"><i class="fas fa-plus-circle"></i> Add Choice</button>
+                    </div>
+                    <small class="text-danger pl-4" id="newChoiceInputError"></small>
+                </div>
+
+                <ul id="existingChoicesList" class="list-group" style="max-height: 200px; overflow-y: auto;"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Add Sub Choice Modal -->
+<div class="modal fade" id="addSubChoiceModal" role="dialog" tabindex="-1" aria-labelledby="addSubChoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content p-3">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Section Sub Choice</h5>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Section Master Metadata Dropdown -->
+                <div class="row">
+                    <strong><label><span class="text-warning">* </span>Section Master Metadata Name:</label></strong>
+                </div>
+                <div class="row">
+                    <select id="modalMetadataSelect" class="form-control modalMetadataSelect">
+                        <option value="">Click here to select options.</option>
+                        {% for section_master_metadata_name in fields %}
+                            {% if section_master_metadata_name == "ACTIVITY" %}
+                                <option value="{{ section_master_metadata_name }}">{{ section_master_metadata_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="row">
+                    <small class="text-danger" id="modalMetadataError"></small>
+                </div>
+
+                <!-- Related Choices Dropdown -->
+                <div class="row">
+                    <strong><label><span class="text-warning">* </span>Select a Choice:</label></strong>
+                </div>
+                <div class="row">
+                    <select id="modalChoiceSelect" class="form-control modalChoiceSelect" disabled>
+                        <option value="">Click here to select options.</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <small class="text-danger" id="modalChoiceError"></small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="modalSubmitChoiceBtn" class="btn btn-success">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Manage Special Character Modal -->
+<div class="modal fade" role="dialog" id="specialCharModal" tabindex="-1" aria-labelledby="specialCharModalLabel" aria-hidden="true">
+    {% csrf_token %}
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Special Characters</h5>
+                <button title="Close" type="button" class="btn btn-primary" onclick="location.reload(); loader('show');" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-center form_container">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered styled-table styled-table-hover styled-table-striped" id="example_special_char" style="min-width:745px;" data-order='[[ 0, "desc" ]]'>
+                            <thead>
+                                <tr align="center">
+                                    <th style="width: 20px;">ID</th>
+                                    <th>Choices or Parameters</th>
+                                    <th>Special Character</th>
+                                    <th style="width: 20px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for choice in choices %}
+                                    <tr data-id="{{ choice.id }}">
+                                        <td>{{ choice.id }}</td>
+                                        <td>{{ choice.master_choice }}</td>
+                                        <td class="char-column">
+                                            <select title="Click to select special character" class="form-control special-char-select">
+                                                {% if choice.special_char_choice == 'MINOR' %}
+                                                    <option value="MINOR" selected>&#9675; MINOR</option>
+                                                    <option value="MAJOR">&#9681; MAJOR</option>
+                                                    <option value="CRITICAL">&#9679; CRITICAL</option>
+                                                {% elif choice.special_char_choice == 'MAJOR' %}
+                                                    <option value="MINOR">&#9675; MINOR</option>
+                                                    <option value="MAJOR" selected>&#9681; MAJOR</option>
+                                                    <option value="CRITICAL">&#9679; CRITICAL</option>
+                                                {% elif choice.special_char_choice == 'CRITICAL' %}
+                                                    <option value="MINOR">&#9675; MINOR</option>
+                                                    <option value="MAJOR">&#9681; MAJOR</option>
+                                                    <option value="CRITICAL" selected>&#9679; CRITICAL</option>
+                                                {% else %}
+                                                    <option value="" selected>-- Select --</option>
+                                                    <option value="MINOR">&#9675; MINOR</option>
+                                                    <option value="MAJOR">&#9681; MAJOR</option>
+                                                    <option value="CRITICAL">&#9679; CRITICAL</option>
+                                                {% endif %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button title="Click here to save special character" class="btn btn-sm btn-primary add-char"><i class="fas fa-save btn-primary"></i></button>
+                                            <button title="Click here to delete special character" class="btn btn-sm btn-danger delete-char"><i class="fas fa-trash-alt btn-danger"></i></button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block extracode %}
+<script>
+    $(document).ready(function(){
+        $(".section-master-name-select").select2({
+            placeholder: "Create section master name.",
+            closeOnSelect: true,
+            tags: true,
+            allowClear: true,
+            multiple: false,
+        });
+        $(".section-master-metadata-name-select").select2({
+            placeholder: "Select section master metadata.",
+            closeOnSelect: true,
+            tags: false,
+            allowClear: true,
+            multiple: false,
+        });
+        $(".modalMetadataSelect").select2({
+            placeholder: "Click here to select options.",
+            closeOnSelect: true,
+            tags: false,
+            allowClear: true,
+            multiple: false,
+        });
+        $(".modalChoiceSelect").select2({
+            placeholder: "Click here to select options.",
+            closeOnSelect: true,
+            tags: false,
+            allowClear: true,
+            multiple: false,
+        });
+
+    });
+    </script>
+	<script src="{% static 'project_management/js/manage_section_master.js' %}?version=1" type="text/javascript"></script>
+    <script src="{% static 'project_management/js/manage_special_character.js' %}?version=1" type="text/javascript"></script>
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

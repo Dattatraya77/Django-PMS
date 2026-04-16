@@ -1,0 +1,356 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<style>
+    .card-body {
+        padding:0.5rem;
+    }
+    .item-card{
+        transition:0.5s;
+        cursor:pointer;
+    }
+    .item-card-title{
+        font-size:15px;
+        transition:1s;
+        cursor:pointer;
+    }
+    .item-card-title i{
+        font-size:15px;
+        transition:1s;
+        cursor:pointer;
+        color:#ffa710
+    }
+    .card-title i:hover{
+        transform: scale(1.25) rotate(100deg);
+        color:#18d4ca;
+    }
+    .reporting-card:hover{
+        transform: scale(1.05);
+        box-shadow: 10px 10px 15px rgba(0,0,0,0.3);
+    }
+
+    .reporting-card::before, .reporting-card::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        transform: scale3d(0, 0, 1);
+        transition: transform .3s ease-out 0s;
+        background: rgba(255, 255, 255, 0.1);
+        content: '';
+        pointer-events: none;
+    }
+    .reporting-card::before {
+        transform-origin: left top;
+    }
+    .reporting-card::after {
+        transform-origin: right bottom;
+    }
+    .reporting-card:hover::before, .reporting-card:hover::after, .reporting-card:focus::before, .reporting-card:focus::after {
+        transform: scale3d(1, 1, 1);
+    }
+    .select2-container {
+        min-width: 420px;
+    }
+    .select2-results__options{
+        font-size:14px !important;
+    }
+    .select2-results__placeholders{
+        font-size:11px !important;
+    }
+    .select2-container--default.select2-container--disabled .select2-selection--multiple {
+        background-color: #d0ffd0;
+    }
+    a, a:hover, a:focus, a:active {
+        text-decoration: none;
+        color: inherit;
+    }
+    .swal2-popup-custom {
+        width: 25em !important;
+        padding: 0.25em !important;
+        font-size: 0.9rem !important;
+    }
+    .swal2-icon.swal2-error {
+        border-color: #dc3545 !important;
+        color: #dc3545 !important;
+    }
+    .swal2-styled.swal2-cancel {
+        border-radius: 1.25em !important;
+        font-size: 1em !important!;
+    }
+    .swal2-styled.swal2-confirm {
+        border-radius: 1.25em !important;
+        font-size: 1em !important!;
+    }
+    .swal2-popup {
+        width:21em;
+    }
+</style>
+<style>
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 0px !important;
+    }
+    .buttons-html5 {
+        padding:1px 6px !important;
+    }
+    .btn-sm{
+        padding:0.25rem -0.5rem;
+        line-height:0.5;
+        border-radius:0rem;
+        font-size: 13px;
+    }
+    .dropdown-menu {
+        min-width:0rem;
+        padding:0.3rem 2px;
+        margin:0.125rem -200px 0px;
+        height: 200px;
+        overflow: auto;
+    }
+    sub {
+        bottom : 0.1em;
+    }
+    .dropdown-divider {
+        margin:0rem;
+    }
+    .col {
+        padding-right:0px;
+        padding-left:0px;
+    }
+    .row {
+        flex-wrap:nowrap;
+    }
+</style>
+<style>
+    .highcharts-credits {
+      display: none;
+    }
+    .highcharts-figure,
+    .highcharts-data-table table {
+        min-width: 310px;
+        max-width: 800px;
+        margin: 1em auto;
+    }
+    .highcharts-data-table table {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #ebebeb;
+        margin: 10px auto;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+    }
+    .highcharts-data-table caption {
+        padding: 1em 0;
+        font-size: 1.2em;
+        color: #555;
+    }
+    .highcharts-data-table th {
+        font-weight: 600;
+        padding: 0.5em;
+    }
+    .highcharts-data-table td,
+    .highcharts-data-table th,
+    .highcharts-data-table caption {
+        padding: 0.5em;
+    }
+    .highcharts-data-table thead tr,
+    .highcharts-data-table tr:nth-child(even) {
+        background: #f8f8f8;
+    }
+    .highcharts-data-table tr:hover {
+        background: #f1f7ff;
+    }
+    tspan.highcharts-text-outline {
+      stroke-width: 0px;
+    }
+    .highcharts-label text {
+      font-weight:normal!important;
+    }
+</style>
+
+<div class="container">
+    <div class="row" style="padding-top:20px; padding-left:15px;">
+        <a title="Click here to view Reporting dashboard" href="/project-management/reporting-dashboard/"><button class="active btn btn-outline-primary">Reporting Dashboard <i class="fas fa-chart-bar mr-1"></i></button></a>
+        <a title="Click here to view more charts" class="pl-2" href="{% url 'more-charts' %}"><button class="btn btn-outline-primary">More Charts <i class="fas fa-chart-pie mr-1"></i></button></a>
+    </div>
+    <hr class="mb-0">
+
+    <div class="row" style="padding-top:20px;padding-left:15px;">
+
+        <div class="col pb-2 item" title="Total number of completed tasks">
+            <div class="card reporting-card text-success border-success mb-3 item-card" style="border-radius: 20px; width:13rem; height:10rem;">
+                <div class="card-header border-success"><i class="fas fa-check-circle pr-2"></i> Completed tasks</div>
+                <div class="card-body pt-4 d-flex justify-content-center">
+                    <h1 class="card-text text-success">{{ completed_tasks_count }}</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="col pb-2 item" title="Total number of incomplete tasks" style="padding-left:20px;">
+            <div class="card reporting-card border-warning text-warning mb-3 item-card" style="border-radius: 20px; width:13rem; height:10rem;">
+                <div class="card-header border-warning"><i class="fas fa-times-circle pr-2"></i> Incomplete tasks</div>
+                <div class="card-body pt-4 d-flex justify-content-center">
+                    <h1 class="card-text text-warning">{{ incomplete_tasks_count }}</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="col pb-2 item" title="Total number of overdue tasks" style="padding-left:20px;">
+            <div class="card reporting-card text-danger border-danger mb-3 item-card" style="border-radius: 20px; width:13rem; height:10rem;">
+                <div class="card-header border-danger"><i class="fas fa-arrow-circle-left pr-2"></i> Overdue tasks</div>
+                <div class="card-body pt-4 d-flex justify-content-center">
+                    <h1 class="card-text text-danger">{{ overdue_tasks_count }}</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="col pb-2 item" title="Total number of upcoming tasks" style="padding-left:20px;">
+            <div class="card reporting-card text-primary border-primary mb-3 item-card" style="border-radius: 20px; width:13rem; height:10rem;">
+                <div class="card-header border-primary"><i class="fas fa-arrow-circle-down pr-2"></i> Upcoming tasks</div>
+                <div class="card-body pt-4 d-flex justify-content-center">
+                    <h1 class="card-text text-primary">{{ upcoming_tasks_count }}</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="col pb-2 item" title="Total number of tasks" style="padding-left:20px;">
+            <div class="card reporting-card text-secondary border-secondary mb-3 item-card" style="border-radius: 20px; width:13rem; height:10rem;">
+                <div class="card-header border-secondary"><i class="fas fa-spinner pr-2"></i> Total tasks</div>
+                <div class="card-body pt-4 d-flex justify-content-center">
+                    <h1 class="card-text text-secondary">{{ total_tasks_count }}</h1>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <hr class="mb-4 mt-0">
+
+    <div class="row">
+        <section class="col-lg-6 connectedSortable">
+            <div class="card item-card border-danger">
+                <div class="card-header border-danger">
+                    <h5 class="card-title text-danger">
+                        <i class="fas fa-chart-bar mr-1"></i>
+                        Overdue tasks by project
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <figure class="tab-content p-0">
+                        <figure class="highcharts-figure">
+                            <div id="overdue-tasks-canvas" style="height: 400px;"></div>
+                        </figure>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section class="col-lg-6 connectedSortable">
+            <div class="card item-card border-warning">
+                <div class="card-header border-warning">
+                    <h5 class="card-title text-warning">
+                        <i class="fas fa-chart-bar mr-1"></i>
+                        Incomplete tasks by project
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <figure class="tab-content p-0">
+                        <figure class="highcharts-figure">
+                            <div id="incomplete-tasks-canvas" style="height: 400px;"></div>
+                        </figure>
+                    </figure>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="row pt-3">
+        <section class="col-lg-6 connectedSortable">
+            <div class="card item-card border-primary">
+                <div class="card-header border-primary">
+                    <h5 class="card-title text-primary">
+                        <i class="fas fa-chart-bar mr-1"></i>
+                        Upcoming tasks by project
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <figure class="tab-content p-0">
+                        <figure class="highcharts-figure">
+                            <div id="upcoming-tasks-canvas" style="height: 400px;"></div>
+                        </figure>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section class="col-lg-6 connectedSortable">
+            <div class="card item-card border-success">
+                <div class="card-header border-success">
+                    <h5 class="card-title text-success">
+                        <i class="fas fa-chart-bar mr-1"></i>
+                        Completed tasks by project
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <figure class="tab-content p-0">
+                        <figure class="highcharts-figure">
+                            <div id="completed-tasks-canvas" style="height: 400px;"></div>
+                        </figure>
+                    </figure>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+</div>
+
+{% endblock %}
+
+{% block extracode %}
+
+
+
+{% endblock %}
+
+{% block extrajs %}
+
+<!-- Highcharts Core -->
+<script src="{% static 'highcharts/highcharts.js' %}"></script>
+
+<!-- Highstock -->
+<script src="{% static 'highcharts/highstock.js' %}"></script>
+
+<!-- Highcharts More -->
+<script src="{% static 'highcharts/highcharts-more.js' %}"></script>
+
+<!-- Dumbbell -->
+<script src="{% static 'highcharts/dumbbell.js' %}"></script>
+
+<!-- Lollipop -->
+<script src="{% static 'highcharts/lollipop.js' %}"></script>
+
+<!-- 3D -->
+<script src="{% static 'highcharts/highcharts-3d.js' %}"></script>
+
+<!-- Exporting -->
+<script src="{% static 'highcharts/exporting.js' %}"></script>
+
+<!-- Export Data -->
+<script src="{% static 'highcharts/export-data.js' %}"></script>
+
+<!-- Accessibility -->
+<script src="{% static 'highcharts/accessibility.js' %}"></script>
+
+<script>
+    const project_labels_list = {{ project_labels|safe }};
+    const overdue_tasks_data_list = {{ overdue_tasks_data|safe }};
+    const incomplete_tasks_data_list = {{ incomplete_tasks_data|safe }};
+    const upcoming_tasks_data_list = {{ upcoming_tasks_data|safe }};
+    const completed_tasks_data_list = {{ completed_tasks_data|safe }};
+</script>
+
+<script src="{% static 'project_management/js/reporting_dashboard.js' %}?version=2" type="text/javascript"></script>
+{% endblock %}

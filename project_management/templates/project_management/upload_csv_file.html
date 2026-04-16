@@ -1,0 +1,123 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+
+{% block css %}
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 0px !important;
+    }
+
+    .dropzone {
+        min-height: 195px;
+        background: white;
+        padding: 25px 54px;
+        border: 2px dashed #0087F7;
+        border-radius: 5px;
+    }
+
+    .dragover {
+        border-color: black;
+        background-color: whitesmoke;
+        box-shadow: inset 0px 0px 15px 0px #5252527d;
+    }
+
+    .buttons-html5 {
+        padding:1px 6px !important;
+    }
+
+    .selected-file-chip{
+        font-size: 15px;
+        padding: 5px 10px;
+        border-radius: 15px;
+        max-height: 100px;
+        overflow: scroll;
+        text-align: left;
+        font-weight: 500;
+    }
+
+    .btn-upload-associate{
+        padding:0.25rem -0.5rem;
+        line-height:1.5;
+        border-radius:1.2rem;
+        font-size: 13px;
+        margin-top:10px;
+        width:200px;
+        margin-left:60px;
+    }
+    .dropdown-menu {
+        min-width:15rem;
+        padding:0.3rem 2px;
+        margin:0.125rem -123px 0px;
+        height:200px;
+        overflow: auto;
+    }
+    sub {
+        bottom : 0.1em;
+    }
+    div.scroll {
+        margin:4px, 4px;
+        padding:4px;
+        background-color: steel;
+        width: 450px;
+        max-height: 250px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align:justify;
+    }
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-9">
+            <div class="card card-primary" style="margin-top:40px;">
+                <div class="card-body">
+                    <div class="container" >
+                        <form method="post"  enctype="multipart/form-data" novalidate="" class="box has-advanced-upload" id="myForm">
+                            {% csrf_token %}
+                            <div class="row justify-content-center">
+                                <div class="col-12 text-center mt-2">
+                                    <h5 style="font-weight: bold;">Upload new CSV file</h5><h6 class="mt-2" id="upload-hint">Supported file format - CSV</h6>
+                                </div>
+
+                                <div class="col-lg-9 dropzone" id="dropzone">
+                                    <div class="row justify-content-center h-100">
+                                        <div class="col-md-2 col-lg-2 col-sm-12 my-auto">
+                                            <i class='fas fa-file-csv fa-4x text-success'></i>
+                                        </div>
+                                        <div class="col-10 text-center my-auto">
+                                            <img src="/media/profile_pics/file_upload_arrow.png" alt="" width="30px" class="d-inline mr-2">
+                                            <p class="mt-4 d-inline">Drag & Drop your file here <br> or <br><i class='fas fa-desktop mr-3' style='font-size:30px'></i><a href="#" id="alt-select-file">Attach file from computer</a></p>
+                                            <input type="file" name="files" id="file-input" class="form-control p-1 d-none" multiple>
+                                            <br>
+                                            <div class="selected-file-chip d-none" id="file-help"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="box__uploading">Uploading…</div>
+
+                            <input type="hidden" name="ajax" value="1">
+
+                            <div class="mx-5 pt-3" id="alert_wrapper"></div>
+                            <br>
+                            <div class="my-auto d-flex justify-content-center" id="upload-btn">
+                                <button disabled class="btn btn-upload-associate btn-block btn-outline-primary" type="submit" id="upload" style="padding:0; font-size: 1.1rem;">Upload file</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extracode %}
+    <script src="{% static 'project_management/js/upload_csv_file.js' %}?version=2" type="text/javascript"></script>
+{% endblock %}

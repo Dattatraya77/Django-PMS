@@ -1,0 +1,1926 @@
+{% load static %}
+{% load tz %}
+<!DOCTYPE html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Group model cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta/dist/css/bootstrap-select.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+          integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.6/css/responsive.dataTables.min.css">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static '/images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{% static '/images/favicon-96x96.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static '/images/favicon-16x16.png' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static '/custom/css/main.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/custom/css/sidebar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/custom/css/font-awesome-5.15.2.css' %}">
+
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+
+    <!--  instascan -->
+    <script src="{% static 'instascan/instascan.min.js' %}" type="text/javascript"></script>
+
+    <!--    gantt chart view-->
+    <script src="{% static 'gantt/dhtmlxgantt.js' %}" type="text/javascript"></script>
+    <link rel="stylesheet" href="{% static 'gantt/dhtmlxgantt.css' %}" />
+
+    <!--    tree grid view-->
+    <script type="text/javascript" src="{% static 'treegrid/codebase/treegrid.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'treegrid/codebase/treegrid.css' %}">
+    <link rel="stylesheet" href="{% static 'treegrid/codebase/assets/css/auxiliary_controls.css' %}">
+    <script type="text/javascript" src="{% static 'treegrid/codebase/suite.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'treegrid/codebase/suite.css' %}">
+
+    {% if title %}
+        <title>Welcome to Solviti - {{ title }}</title>
+    {% else %}
+        <title>Welcome to Solviti</title>
+    {% endif %}
+
+    <style>
+        .highlight-date {
+            color: #fff;
+        }
+        .highlight-date:after {
+            background-color: #ff5252;
+            opacity: 1;
+            z-index: -3;
+        }
+        .dhx-demo_grid-actions {
+            display: flex;
+        }
+        .tree_grid_dropdown_menu .dropdown-menu .grid-actions-header {
+            padding-left: 8px;
+        }
+        .dhx-demo_grid-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 28px;
+            width: 28px;
+            background: inherit;
+            border: none;
+            cursor: pointer;
+            margin: 0 8px;
+            border-radius: 2px;
+        }
+        .dhx-demo_grid-action--addSubtask {
+            border: 0px solid var(--dhx-color-primary);
+            color: var(--dhx-color-primary);
+        }
+        .dhx_grid-row:hover {
+            background-color: #fff3a1;
+        }
+        .dhx-demo_grid-action--addTask {
+            border: 0px solid var(--dhx-color-primary);
+            color: var(--dhx-color-primary);
+        }
+        .dhx-demo_grid-action--remove {
+            border: 0px solid var(--dhx-color-danger);
+            color: var(--dhx-color-danger);
+        }
+        .dhx-demo_grid-action--removeAllTask {
+            border: 0px solid var(--dhx-color-danger);
+            color: var(--dhx-color-danger);
+        }
+        .dhx-demo_grid-action--updateTask {
+            border: 0px solid var(--dhx-color-success);
+            color: var(--dhx-color-success);
+        }
+        .dhx-demo_grid-template {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .dhx-demo_grid-status {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 6px;
+            font-size: var(--dhx-font-size-small);
+        }
+        .dhx-demo_grid-status--completed {
+            background-color: var(--dhx-color-success);
+        }
+        .dhx-demo_grid-status--not-started {
+            background-color: var(--dhx-color-primary);
+        }
+        .dhx-demo_grid-status--on-hold {
+            background-color: var(--dhx-color-danger);
+        }
+        .dhx-demo_grid-status--in-progress {
+            background-color: var(--dhx-color-secondary);
+        }
+        .select2-container {
+            min-width: 345px;
+        }
+        .select2-container--default .select2-selection--multiple.select2-selection--clearable {
+            height:34px;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            margin-top:3px;
+        }
+        .select2-container--default .select2-selection--single.select2-selection--clearable {
+            height:34px;
+        }
+        .select2-container .select2-selection--single {
+            height:34px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height:34px;
+        }
+        .swal2-popup-custom {
+            width: 25em !important;
+            padding: 0.25em !important;
+            font-size: 0.9rem !important;
+        }
+        .swal2-icon.swal2-error {
+            border-color: #dc3545 !important;
+            color: #dc3545 !important;
+        }
+        .swal2-styled.swal2-cancel {
+            border-radius: 1.25em !important;
+            font-size: 1em !important!;
+        }
+        .swal2-styled.swal2-confirm {
+            border-radius: 1.25em !important;
+            font-size: 1em !important!;
+        }
+        .swal2-popup {
+            width:21em;
+        }
+        .tree_grid_dropdown.dropdown, .tree_grid_dropdown.dropleft, .tree_grid_dropdown.dropright, .tree_grid_dropdown.dropup {
+            position:fixed;
+            margin-right:70px;
+            margin-top:20px;
+            display:contents;
+        }
+        .dhx_grid-header-cell-text_content {
+            display:inline-block;
+        }
+        .tree_grid_dropdown_menu.dropdown-menu.show {
+            position:fixed !important;
+            z-index: 25 !important;
+        }
+<!--        .dhx_grid-header-cell&#45;&#45;align_center .dhx_grid-header-cell-text_content {-->
+<!--            width:5px;-->
+<!--        }-->
+        .tree_grid_dropdown_menu.dropdown-menu {
+            top:-30px !important;
+            left:20px !important;
+            z-index: 1 !important;
+            height:155px !important;
+            min-width:65px;
+            max-width:65px;
+            overflow-y: auto;
+        }
+        .tree_grid_dropdown_menu.dropdown-menu.show {
+            display:grid;
+            height:auto;
+        }
+
+        /* Nested grid styles with proper scrollbars */
+        .nested-grid {
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            max-height: 500px;  /* Ensure scrolling works */
+            overflow-x: auto;   /* Horizontal Scroll */
+            overflow-y: auto;   /* Vertical Scroll */
+        }
+
+        /* Push down rows when nested grid is shown */
+        .dhx_grid-row {
+            position: relative;
+        }
+
+        /* Prevents overlap issues */
+        .nested-grid .dhx_treegrid {
+            width: 100%;
+        }
+
+        /* Fix scrollbar styling */
+        .nested-grid::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .nested-grid::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+        .nested-grid::-webkit-scrollbar-track {
+            background: #f4f4f4;
+        }
+        .select2-container .select2-selection--multiple {
+            min-height:38px;
+        }
+        .select2-container .select2-selection--single {
+            min-height:38px;
+        }
+        .tree_grid_dropdown_menu.dropdown-divider {
+            margin:0rem;
+        }
+        .buttons-html5 {
+            padding:1px 6px !important;
+        }
+        .myCustomClass{
+            <i class="glyphicon glyphicon-cloud"></i>;
+        }
+        table#projectTaskLogHistoryTable {
+            display:inline-table !important;
+        }
+        .col_cell_color {
+            background: #f2f2f2;
+        }
+        .signature_col_cell_color {
+            background: palegreen;
+        }
+        #manageSectionMetadataTable tbody tr {
+            height: 30px;  /* Adjust the height as needed */
+        }
+
+        #manageSectionMetadataTable td,
+        #manageSectionMetadataTable th {
+            padding: 5px 8px;  /* Reduce padding for a more compact look */
+            font-size: 14px;  /* Adjust font size for better fit */
+        }
+        .myBtn {
+            line-height:0rem;
+            padding: 0.2rem 0.2rem;
+        }
+
+    </style>
+    <style>
+        .dataTables_filter input {
+            background-color : white !important;
+            border-radius : 5px !important;
+            height: 30px;
+            font-family : -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",
+            sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji" !important;
+
+            font-size : 1rem ;
+        }
+
+        .notification {
+          color: white;
+          text-decoration: none;
+          padding: 5px 10px;
+          position: relative;
+          display: inline-block;
+          border-radius: 2px;
+        }
+
+        .notification:hover {
+          cursor: pointer;
+        }
+
+        .notification .badge {
+          position: absolute;
+          top: 1px;
+          right: 1px;
+          padding: 2px 4px;
+          border-radius: 50%;
+          background-color: #e02e4a;
+          color: white;
+        }
+        .dataTables_wrapper {
+            font-size: 13px;
+            position: relative;
+            clear: both;
+            *zoom: 1;
+            zoom: 1;
+        }
+        #url_preview{
+           width:468px;
+           height: 295px;
+           margin:0px auto;
+        }
+        #camera_preview{
+           width:468px;
+           height: 295px;
+           margin:0px auto;
+        }
+        #navbarTogglerDemo01{
+            background:#fafafa;
+            margin-left:60px;
+            justify-content: space-between;
+            border: 1px solid black;
+            border-radius: 10px;
+            padding-right:20px;
+        }
+        .ml-5{
+            margin-left:10px !important;
+        }
+        .mt-2{
+            margin-top:0px !important;
+        }
+         .sol-main-sidebar{
+            height:93vh;
+            overflow-y: scroll;
+            padding-bottom:100px;
+        }
+            .sol-main-sidebar::-webkit-scrollbar {
+            width: 0px;
+        }
+        .sol-main-sidebar:hover::-webkit-scrollbar {
+            width: 14px;
+        }
+
+        .sol-main-sidebar::-webkit-scrollbar-track {
+            background: #dee2e6;
+            border-radius: 5px;
+            box-shadow: inset 7px 10px 12px #f0f0f0;
+        }
+
+        .sol-main-sidebar::-webkit-scrollbar-thumb {
+            background: #82a1c1;
+            border-radius: 5px;
+        }
+        .sol-main-sidebar::-webkit-scrollbar-thumb:hover {
+            background: #5da0e7;
+        }
+        .dhx_sample-controls {
+            min-height:120px;
+        }
+        .sidebar{
+            padding-top:40px;
+        }
+        .fixed-top {
+            padding-left:65px;
+        }
+        .select2-container--default .select2-selection--multiple.select2-selection--clearable {
+            height: 100px;
+        }
+        input[type="number"] {
+            border: none;
+            outline: none;
+            width:25px;
+        }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .select2-container .select2-search--inline .select2-search__field {
+            height:22px;
+        }
+        progress {
+            text-align: center;
+            padding-top: 6px;
+            color: black;
+            font-size: x-small;
+        }
+        progress:after {
+            content: attr(value)'%';
+        }
+        .dhx_align-left, .dhx_align-left .dhx_grid-cell__content {
+            justify-content:space-between!important;
+        }
+        .group-task-row {
+            font-weight: bold !important;
+            font-size: 16px;
+        }
+        .dhx_grid-cell {
+            border-top:var(--dhx-border);
+            border-bottom:var(--dhx-border);
+        }
+        #manageSectionLabelTable th,
+        #manageSectionLabelTable td {
+            padding: 0.2rem !important;
+        }
+        {% block css %}{% endblock %}
+    </style>
+
+    <style>
+        .severity-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+        .severity {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .circle {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid black;
+            position: relative;
+            overflow: hidden;
+        }
+        .major::after {
+            content: "";
+            width: 50%;
+            height: 100%;
+            background: black;
+            position: absolute;
+            top: 0;
+            left: 50%; /* Shift to the right half */
+            border-top-right-radius: 50%;
+            border-bottom-right-radius: 50%;
+        }
+        .critical {
+            background: black;
+        }
+    </style>
+
+    <style>
+        /* Table container to enable horizontal scrolling */
+        .table-container {
+            max-width: 100%; /* Ensure it does not overflow */
+            overflow-x: auto; /* Enables horizontal scrolling */
+            white-space: nowrap; /* Prevents wrapping */
+            border: 1px solid #ccc; /* Adds a border around the container */
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9; /* Light background */
+        }
+
+        /* Table Styling */
+        .custom-table {
+            border-collapse: collapse;
+            width: auto; /* Makes it responsive */
+            min-width: 600px; /* Ensure it has enough space */
+            max-width: 100%;
+        }
+
+        /* Table Header & Sub-Headers */
+        .custom-table th {
+            background-color: #007bff; /* Blue background */
+            color: white; /* White text */
+            padding: 5px;
+            text-align: center;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            min-width: 100px; /* Reduce width */
+        }
+
+        /* Table Body Cells */
+        .custom-table td {
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+            min-width: 100px; /* Reduce width */
+            height: 35px; /* Reduce height */
+        }
+
+        /* Input fields inside the table */
+        .minWidthInput {
+            width: 80px; /* Reduce input width */
+            height: 25px; /* Reduce input height */
+            text-align: center;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        /* On focus, highlight input */
+        .minWidthInput:focus {
+            border-color: #28a745; /* Green border on focus */
+        }
+        #manageSectionHeaderTable tbody tr {
+            height: 30px;  /* Adjust the height as needed */
+        }
+
+        #manageSectionHeaderTable td,
+        #manageSectionHeaderTable th {
+            padding: 5px 8px;  /* Reduce padding for a more compact look */
+            font-size: 14px;  /* Adjust font size for better fit */
+        }
+        #sectionMetadata option:disabled {
+            color: #ffc107 !important; /* Bootstrap warning color */
+            font-size: 90%;
+            font-style: italic;
+        }
+        .section-group-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 0px;
+            border: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .section-metadata-cell {
+            min-width: 120px;
+            padding: 2px 12px;
+            margin-right: 0px;
+            text-align: center;
+            background-color: aquamarine;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        #showMetadataTrackingDiv .mb-4 {
+            border-left: 3px solid #0d6efd;
+            padding-left: 1rem;
+        }
+
+
+    </style>
+</head>
+
+<body class="sidebar-mini sidebar-closed sidebar-collapse">
+
+<header class="site-header">
+    <audio id="myAudio" hidden>
+      <source src="{% static '/images/notify_beep.wav' %}" type="audio/ogg">
+    </audio>
+    <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top bg-dark">
+        <a class="navbar-brand text-bold" href="{% url 'search_dashboard' %}"><img src="/media/profile_pics/solviti-logo.png" width="100" class="d-inline-block align-top" alt=""></a>
+
+        <div class="container collapse" id="navbarSupportedContent">
+            <button class="mr-3 btn btn-sm btn-light pushmenu btn-menu" role="button"><i class="fas fa-bars"></i></button>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a href="#" class="text-white searchURL mr-5" id="searchURL" title="Scan URL">
+                <i class="fas fa-qrcode text-warning"></i>
+            </a>
+            <input type="hidden" id="client_name" value="{{ client_name|lower }}">
+            <input type="hidden" id="current_site_domain" value="{{ current_site_domain }}">
+
+            <div class="collapse navbar-collapse" id="navbarToggle">
+
+                <div class="navbar-nav mr-auto">
+                    <a class="navbar-brand" href="{% url 'search_dashboard' %}">Digital Transformation Platform</a>
+                </div>
+                {% if client_company_name %}
+                    <div class="navbar-nav mr-5">
+                        <a class="navbar-brand" href="{% url 'search_dashboard' %}">{{ client_company_name }}</a>
+                    </div>
+                {% endif %}
+                <div id="total-time-left" title="Session expire time left" class="text-warning pr-2" align="center" hidden></div>
+                <!-- Navbar Right Side -->
+                <div class="navbar-nav">
+                    {% if user.is_authenticated %}
+
+                        {% if client_logo %}
+                            <a class="navbar-brand" href="{% url 'search_dashboard' %}" style="margin-right:0px;">
+                                <img src="{{ client_logo }}" alt="" height="30">
+                            </a>
+                        {% else %}
+                            <a class="navbar-brand" href="{% url 'search_dashboard' %}" style="margin-right:0px;">{{ client_name|title }}</a>
+                        {% endif %}
+
+                        <a onclick="myDropdownAnchor()" title="User Settings" href="#" class="dropbtn navbar-brand" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true"><i class="fas fa-user-cog pl-2"></i>
+                            <div class="dropleft" role="group" aria-label="First group">
+                                <div class="dropdown-menu dropdown-content" id="myDropdown">
+                                    <a class="dropdown-item" href="{% url 'profile' %}">
+                                        <i class="fas fa-user fa-lg pr-3"></i>
+                                        <span class="pl-2">Profile</span>
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    {% csrf_token %}
+                                    <a class="dropdown-item user_logout" onclick="user_logout_func('{{ request.user }}')" href="#" id="user_logout">
+                                        <i class="fas fa-sign-out-alt fa-lg pr-3"></i>
+                                        <span class="pl-2">Logout</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </a>
+                        <script>
+                            function myDropdownAnchor(){
+                                $(myDropdown).css('min-width','10rem');
+                                $(myDropdown).css('height','125px');
+                                $(myDropdown).css('margin-top','27px');
+                                $(myDropdown).css('margin-right','1.125rem');
+                            }
+                        </script>
+
+                    {% else %}
+                        <a class="nav-item nav-link {% if type == 'login' %}active{% endif %}" href="{% url 'login' %} glyphicon glyphicon-log-in">Login</a>
+                        <a class="nav-item nav-link {% if type == 'register' %}active{% endif %}" href="{% url 'register' %}">Register</a>
+                        <a class="nav-item nav-link {% if type == 'support' %}active{% endif %}" href="{% url 'register' %}">Support</a>
+                        <a class="nav-item nav-link {% if type == 'help' %}active{% endif %}" href="{% url 'register' %}">help</a>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </nav>
+</header>
+
+{% include "sidebar.html" %}
+
+<script>
+    const column_data = {{ columns|safe }};
+    const task_data = {{ task_data_list|safe }};
+    const project_id = {{ project_id|safe }};
+    const delete_permissions = '{{ delete_permissions|safe }}';
+    const is_proj_editable = {{ proj_lock|safe }};
+</script>
+
+
+<section class="dhx_sample-controls d-flex justify-content-start" style="padding-top:40px; padding-left:100px;">
+    <div class="col" style="padding-top:60px;">
+        <div class="row">
+            <h5>Project name: {{ project_name }}</h5>
+        </div>
+        <div class="row">
+            <h6>Description: {{ project_description }}</h6>
+        </div>
+
+        <div class="row">
+            <a title="List View" href="/project-management/tree-grid-view/{{ project_id }}/"><button class="btn btn-sm btn-outline-success"><img src="/static/images/list-view-icon.png" height="20px"></button></a>
+            <a title="Gantt View" href="/project-management/gantt-chart-view/{{ project_id }}/"><button class="btn btn-sm btn-outline-warning ml-1"><img src="/static/images/gantt-view-icon.png" height="20px"></button></a>
+            <a title="Urgency Matrix View" href="/project-management/urgency-matrix-view/{{ project_id }}/"><button class="btn btn-sm btn-outline-danger ml-1"><img src="/static/images/urgency-matrix-icon.png" height="20px"></button></a>
+            <div class="dhx_form-group dhx_form-group--inline dhx_form-group--no-message-holder" id="form-select" style="width:300px">
+                <label for="col" class="dhx_label">Show/Hide column:</label>
+                <select name="col" class="dhx_select dhx_input" id="col">
+                    <option value="null" disabled selected>Select column name</option>
+                    {% for col_obj in show_hide_column_name_list %}
+                        {% if col_obj.field_hidden == "True" %}
+                            <option class="text-warning" value="{{ col_obj.id }}/{{ col_obj.proj_temp_id }}">{{ col_obj.text }}</option>
+                        {% else %}
+                            <option value="{{ col_obj.id }}/{{ col_obj.proj_temp_id }}">{{ col_obj.text }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <button style="margin-left:6px;" title="Show Column" class="btn btn-sm btn-outline-success" onclick="showCol()"><i class="fas fa-eye"></i></button>
+            <button title="Hide Column" class="btn btn-sm btn-outline-danger" onclick="hideCol()"><i class="fas fa-eye-slash"></i></button>
+            <button title="Export to xlsx file" class="btn btn-sm btn-outline-info" onclick="exportXLSX()"><i class="fas fa-file-export"></i></button>
+            <button title="Task Log History" class="btn btn-sm btn-outline-dark" onclick="getProjectTaskLogHistory('{{ project_id }}')"><i class="fas fa-hospital-symbol"></i></button>
+            <a title="Back to project dashboard" href="{% url 'project-card-view' %}">
+                <button type="button" class="btn btn-sm btn-outline-secondary mr-2"><i class="fas fa-arrow-left"></i></button>
+            </a>
+            {% if show_hide_column_restriction == True %}
+                <button title="Add Column Restriction" class="btn btn-sm btn-outline-danger" onclick="editableColumnRestriction('{{ project_id }}')"><i class="fas fa-columns"></i></button>
+            {% else %}
+                <button hidden title="Add Column Restriction" class="btn btn-sm btn-outline-danger" onclick="#"><i class="fas fa-columns"></i></button>
+            {% endif %}
+        </div>
+
+    </div>
+    {% if proj_lock == "true" %}
+        <div class="alert alert-warning" role="alert">
+            Note: Project locked(<i title="Project Locked" class="fa fa-lock text-danger"></i>). If you want to update, please contact admin.
+        </div>
+    {% endif %}
+</section>
+
+<div id="treegrid" style="margin-left:100px; width: 90%; height: calc(100% - 210px); margin-top:40px;"></div>
+
+
+<!--editable column restriction model-->
+<div class="modal fade" id="editableColumnRestrictionModal" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="editableColumnRestrictionTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editableColumnRestrictionTitle">Column Group Restriction</h5>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="text-center alert-primary">
+                                Add/Update Group Restriction
+                            </h4>
+
+                            <form method="POST" enctype="multipart/form-data" id="editable_column_restriction_form">
+                                {% csrf_token %}
+                                <div id="editable_column_group_div">
+                                </div>
+                                <input type="hidden" value="" id="project_template_field_id" name="project_template_field_name">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--update task model-->
+<div class="modal fade" id="taskUpdateModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="taskUpdateTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskUpdateTitle">Update Task</h5>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="text-center alert-primary">
+                                Update Existing Task
+                            </h4>
+
+                            <form method="POST" enctype="multipart/form-data" id="update_task_form">
+                                {% csrf_token %}
+                                <div id="update_task_div">
+
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <button id="update_task_btn" title="Click to update task" class="btn btn-primary btn-block" type="button"><i class="fas fa-pen"></i> Update Task</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--create or update notification model-->
+<div class="modal fade" id="createUpdateNotificationModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="createUpdateNotificationTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document" style="max-width:880px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createUpdateNotificationTitle">Manage Notifications</h5>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="text-center alert-primary">
+                                {{ notification_action }} Notification Info
+                            </h4>
+
+                            <form method="POST" enctype="multipart/form-data" id="add_edit_notification_form">
+                                {% csrf_token %}
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col-1">
+                                            <label style="font-weight:700;" for="notify_on_off">Notify:</label>
+                                        </div>
+                                        <div class="col-1">
+                                            <input type="checkbox" class="notificationCheckbox" id="notify_on_off" {% if notify %}checked{% else %}value="off"{% endif %} />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <label style="font-weight:700;">Notify List:</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-1">
+                                            <label style="font-weight:700;" for="notify_groups">Groups:</label>
+                                        </div>
+                                        <div class="col-2">
+                                            <input type="checkbox" class="notificationCheckbox" id="notify_groups" {% if groups_on_off %}checked{% else %}value="off"{% endif %} />
+                                        </div>
+                                        <div class="col">
+                                            <span>{{ groups }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-1">
+                                            <label style="font-weight:700;" for="notify_other">Other:</label>
+                                        </div>
+                                        <div class="col-2">
+                                            <input type="checkbox" class="notificationCheckbox" id="notify_other" {% if notify_other %}checked{% else %}value="off"{% endif %} />
+                                        </div>
+                                        <div class="col">
+                                            <select multiple class="notify-other-email-select" id="notify_other_email_select" name="notify_other_email_select">
+                                                {% for email in notify_other %}
+                                                    <option value="{{ email }}" class="form-control" selected>{{ email }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col">
+                                            <label style="font-weight:700;">Notify when milestone is reached:</label>
+                                        </div>
+                                    </div>
+                                    <hr style="margin-top:0px;margin-bottom:6px; border-top:2px solid rgba(0,0,0,.1);">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <span>
+                                                <input type="checkbox" class="notificationCheckbox" id="task_starting" {% if task_starting %}checked{% else %}value="off"{% endif %} />
+                                                <label for="task_starting">Task starting</label>
+                                            </span>
+                                        </div>
+                                        <div class="col-4">
+                                            <span>
+                                                <input name="before_start_date_name" type="checkbox" class="" id="x_days_before_start_date" {% if x_days_before_start_date %}checked{% else %}value="off"{% endif %} />
+                                                <label for="x_days_before_start_date"><select name="select-x-days-before" class="" id="select_x_days_before">
+                                                    <option value="" selected>----</option>
+                                                    {% for day in number_of_days_list %}
+                                                        {% if day == start_date_selected_day %}
+                                                            <option value="{{ day }} days before start date" selected>{{ day }}</option>
+                                                        {% else %}
+                                                            <option value="{{ day }} days before start date">{{ day }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select> days before start date</label>
+                                            </span>
+                                        </div>
+                                        <div class="col-1 text-warning">OR</div>
+                                        <div class="col-4">
+                                            <span>
+                                                <input name="before_start_date_name" type="checkbox" class="" id="x_hours_before_start_date" {% if x_hours_before_start_date %}checked{% else %}value="off"{% endif %} />
+                                                <label for="x_hours_before_start_date"><select name="select-x-hours-before" class="" id="select_x_hours_before">
+                                                    <option value="" selected>----</option>
+                                                    {% for hour in number_of_hours_list %}
+                                                        {% if hour == start_date_selected_hour %}
+                                                            <option value="{{ hour }} hours before start date" selected>{{ hour }}</option>
+                                                        {% else %}
+                                                            <option value="{{ hour }} hours before start date">{{ hour }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select> hours before start date</label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <hr style="margin-top:0px;margin-bottom:6px; border-top:2px solid rgba(0,0,0,.1);">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <span>
+                                                <input type="checkbox" class="notificationCheckbox" id="task_due" {% if task_due %}checked{% else %}value="off"{% endif %} />
+                                                <label for="task_due">Task due</label>
+                                            </span>
+                                        </div>
+                                        <div class="col-4">
+                                            <span>
+                                                <input name="due_in_name" type="checkbox" class="" id="due_in_x_days" {% if due_in_x_days %}checked{% else %}value="off"{% endif %} />
+                                                <label for="due_in_x_days">Due in <select name="select-due-in-x-days" class="" id="select_due_in_x_days">
+                                                    <option value="" selected>----</option>
+                                                    {% for day in number_of_days_list %}
+                                                        {% if day == due_date_selected_day %}
+                                                            <option value="Due in {{ day }} days" selected>{{ day }}</option>
+                                                        {% else %}
+                                                            <option value="Due in {{ day }} days">{{ day }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select> days</label>
+                                            </span>
+                                        </div>
+                                        <div class="col-1 text-warning">OR</div>
+                                        <div class="col-4">
+                                            <span>
+                                                <input name="due_in_name" type="checkbox" class="" id="due_in_x_hours" {% if due_in_x_hours %}checked{% else %}value="off"{% endif %} />
+                                                <label for="due_in_x_hours">Due in <select name="select-due-in-x-hours" class="" id="select_due_in_x_hours">
+                                                    <option value="" selected>----</option>
+                                                    {% for hour in number_of_hours_list %}
+                                                        {% if hour == due_date_selected_hour %}
+                                                            <option value="Due in {{ hour }} hours" selected>{{ hour }}</option>
+                                                        {% else %}
+                                                            <option value="Due in {{ hour }} hours">{{ hour }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select> hours</label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <hr style="margin-top:0px;margin-bottom:6px; border-top:2px solid rgba(0,0,0,.1);">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <span>
+                                                <input type="checkbox" class="notificationCheckbox" id="delayed_by" {% if delayed_by %}checked{% else %}value="off"{% endif %} />
+                                                <label for="delayed_by">Delayed by</label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <hr style="margin-top:0px;margin-bottom:6px; border-top:2px solid rgba(0,0,0,.1);">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <span>
+                                                <input type="checkbox" class="notificationCheckbox" id="task_completed" {% if task_completed %}checked{% else %}value="off"{% endif %} />
+                                                <label for="task_completed">Task completed</label>
+                                            </span>
+                                        </div>
+                                        <div class="col-4">
+                                            <span>
+                                                <input type="checkbox" class="notificationCheckbox" id="reminder_on_whatsapp" {% if reminder_on_whatsapp %}checked{% else %}value="off"{% endif %} />
+                                                <label for="reminder_on_whatsapp">Reminder on whatsapp</label>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <hr style="margin-top:0px;margin-bottom:6px; border-top:2px solid rgba(0,0,0,.1);">
+                                </div>
+                                <br>
+                                <div class="form-group col-md-3">
+                                    <button onclick="postCreateUpdateNotification('{{ project_id }}')" id="create_update_notification_btn" title="Click to add or edit notification" class="btn btn-primary btn-block" type="button">{% if notification_action == 'Create' %}<i class="fas fa-plus-circle"></i> Create{% else %}<i class="fas fa-pen"></i> Update{% endif %}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- add attachment model-->
+<div class="modal fade" id="addAttachmentModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="addAttachmentTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAttachmentTitle">Attachments</h5>
+                <button onclick="window.location.reload();" id="close_attachment" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <div id="alert_attachment_message"></div>
+                            <h4 class="text-center alert-primary">
+                                Add Attachment
+                            </h4>
+
+                            <form method='POST' action='' enctype="multipart/form-data" id="attachment_task_form">
+                                {% csrf_token %}
+                                <label>Please select file</label>
+                                <div class="row">
+                                    <div class="col-10">
+                                        <div class="custom-file">
+                                            <input title="Choose file" type="file" class="form-control custom-file-input pt-2" id="attachment_file_input" name="attachment_file_input" />
+                                            <label for="attachment_file_input" class="custom-file-label mb-2 mr-sm-2" >Choose file</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <input type="hidden" value="" id="attachment_task_id" name="attachment_task_id">
+                                        <input disabled type='button' class='btn btn-primary btn_upload pt-2' value='Upload' id='btn_upload'>
+                                    </div>
+                                </div>
+
+                            </form>
+                            <br>
+                            <hr>
+                            <div class="d-flex justify-content-left">
+                                <h5 id="form-title">Task attachment file list</h5>
+                            </div><br>
+                            <div class="d-flex justify-content-center form_container">
+                                <div class="table-responsive" style="height:250px">
+                                    <table id="attachmentListTable" class="table table-bordered table-striped" data-order='[[ 0, "desc" ]]' style="min-width:1050px;">
+                                        <thead>
+                                            <tr align="center">
+                                                <th id="th_sortFileId">File ID</th>
+                                                <th>File Name</th>
+                                                <th>File Groups</th>
+                                                <th>File Type</th>
+                                                <th>Created By</th>
+                                                <th>Updated On</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody align="center">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- add manage section Label model-->
+<div class="modal fade" id="manageSectionLabelModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="manageSectionLabelTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageSectionLabelTitle">Manage Section Label</h5>
+                <button id="close_manage_section_label" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <div id="alert_manage_section_label_message"></div>
+                            <h4 class="text-center alert-primary">
+                                Add Section Label
+                            </h4>
+
+                            <form method='POST' action='' enctype="multipart/form-data" id="manage_section_label_form">
+                                {% csrf_token %}
+                                <div class="row mt-3">
+                                    <div class="col-5">
+                                        <input placeholder="Enter section label name..." type="text" class="form-control pt-2" id="section_label_key" name="section_label_key" />
+                                    </div>
+                                    <div class="col-5">
+                                        <input placeholder="Enter section label value..." type="text" class="form-control pt-2" id="section_label_value" name="section_label_value" />
+                                    </div>
+                                    <div class="col-2">
+                                        <input type="hidden" value="" id="section_task_id" name="section_task_id">
+                                        <button type="button" class="btn btn-primary" id="btn_add_section_label"><i class="fas fa-plus-circle"></i> Add</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <br>
+                            <hr>
+                            <h4 class="text-center alert-primary">
+                                Section Label List
+                            </h4>
+                            <br>
+                            <div class="d-flex justify-content-center form_container">
+                                <div class="table-responsive" style="height:250px">
+                                    <table id="manageSectionLabelTable" class="table table-bordered table-striped" data-order='[[ 0, "desc" ]]' style="">
+                                        <thead>
+                                            <tr align="center">
+                                                <th>Sr. No.</th>
+                                                <th>Section Label Name</th>
+                                                <th>Section Label Value</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody align="center">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Update Section Label Modal -->
+<div class="modal fade" id="updateSectionLabelModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Section Label</h5>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="old_section_label_key">
+                <input type="text" class="form-control" id="new_section_label_key" placeholder="Section Label Name"><br>
+                <input type="text" class="form-control mt-2" id="new_section_label_value" placeholder="Section Label Value">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="updateSectionLabel()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Signature Modal -->
+<div class="modal fade" id="signatureModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="signatureModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signatureModalLabel">Manage Signature</h5>
+                <button id="closeSignatureModalBtn" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Choose an action:</p>
+                <input type="hidden" id="selected_task_id" name="selected_task_id"> <!-- Store selected task ID -->
+                <button title="Click here to add signature" class="btn btn-success btn-block col-6" id="addSignatureBtn"><i class="fas fa-signature"></i> Add Signature</button>
+                <button title="Click here to update signature" class="btn btn-primary btn-block col-6" id="updateSignatureBtn"><i class="fas fa-pencil-alt"></i> Update Signature</button>
+                <button title="Click here to delete signature" class="btn btn-danger btn-block col-6" id="deleteSignatureBtn"><i class="fas fa-trash-alt"></i> Delete Signature</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Manage Section Metadata Modal -->
+<div class="modal fade" id="manageSectionMetadataModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="manageSectionMetadataTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageSectionMetadataTitle">Manage Section Metadata</h5>
+                <button id="close_manage_section_metadata" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <div id="alert_manage_section_metadata_message"></div>
+                            <h4 class="text-center alert-primary">Add Section Metadata</h4>
+
+                            <form id="manage_section_metadata_form">
+                                {% csrf_token %}
+                                <div class="row mt-3">
+                                    <!-- Metadata Name Input -->
+                                    <!-- Metadata Name Dropdown with Select2 -->
+                                    <div class="col-md-6">
+                                        <select class="form-control" id="section_metadata_key" name="section_metadata_key">
+                                            <option value="">Select or Add Section Metadata...</option>
+                                        </select>
+                                        <small class="text-danger" id="metadata_name_error"></small>
+                                    </div>
+
+                                    <!-- Metadata Type Selection -->
+                                    <div class="col-md-4">
+                                        <select class="form-control" id="section_metadata_type">
+                                            <option value="string" selected>String</option>
+                                            <option value="number">Number</option>
+                                            <option value="date">Date</option>
+                                            <option value="bool">Boolean</option>
+                                            <option value="textarea">Textarea</option>
+                                            <option value="single-select">Single-Select</option>
+                                            <option value="multi-select">Multi-Select</option>
+                                            <option value="people">People</option>
+                                            <option value="signature">Signature</option>
+                                        </select>
+                                        <small class="text-danger" id="metadata_type_error"></small>
+                                    </div>
+
+                                    <!-- Add Button -->
+                                    <div class="col-md-2">
+                                        <input type="hidden" value="" id="section_metadata_task_id" name="section_metadata_task_id">
+                                        <button type="button" class="btn btn-primary" id="btn_add_section_metadata">
+                                            <i class="fas fa-plus-circle"></i> Add
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Choices for Select2 -->
+                                <div class="row mt-3" id="select_choices_container" style="display: none;">
+                                    <div class="col-md-8">
+                                        <select class="form-control" id="select_choices" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                            </form>
+                            <br>
+                            <hr>
+
+                            <h4 class="text-center alert-primary">Section Metadata List</h4>
+                            <br>
+                            <div class="d-flex justify-content-center form_container">
+                                <div class="table-responsive" style="height:250px">
+                                    <table id="manageSectionMetadataTable" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr align="center">
+                                                <th>Sr. No.</th>
+                                                <th>Section Metadata Name</th>
+                                                <th>Type</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody align="center">
+                                            <!-- Metadata list will be populated via JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Update Section Metadata Modal -->
+<div class="modal fade" id="updateSectionMetadataModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Section Metadata</h5>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="old_section_metadata_key">
+                <input type="text" class="form-control" id="new_section_metadata_key" placeholder="Section Metadata Name">
+                <small class="text-danger" id="update_metadata_error"></small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="updateSectionMetadata()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Nested Grid Signature Modal -->
+<div class="modal fade" id="gridSignatureModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="gridSignatureModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gridSignatureModalLabel">Manage Signature</h5>
+                <button id="closeGridSignatureModalBtn" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Choose an action:</p>
+                <button title="Click here to add signature" class="btn btn-success btn-block col-6" id="addGridSignatureBtn"><i class="fas fa-signature"></i> Add Signature</button>
+                <button title="Click here to update signature" class="btn btn-primary btn-block col-6" id="updateGridSignatureBtn"><i class="fas fa-pencil-alt"></i> Update Signature</button>
+                <button title="Click here to delete signature" class="btn btn-danger btn-block col-6" id="deleteGridSignatureBtn"><i class="fas fa-trash-alt"></i> Delete Signature</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- manage section header modal -->
+<div class="modal fade" id="manageSectionHeaderModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="manageSectionHeaderModalLabel">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Section Metadata Header</h5>
+                <button id="close_manage_section_header" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% csrf_token %}
+                <div class="container">
+                    <h4 class="text-center alert-primary">Create Grouped Headers</h4>
+                    <h6 class="text-warning">Note: (*) means required field</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong><label><span class="text-warning">* </span>Header Name:</label></strong>
+                            <input type="text" id="headerName" class="form-control" placeholder="Enter Header Name">
+                            <small class="text-danger" id="headerNameError"></small>
+                        </div>
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col-md-7">
+                            <strong><label><span class="text-warning">* </span>Section Metadata Name:</label></strong>
+                            <select id="sectionMetadata" class="form-control"></select>
+                            <small class="text-danger" id="sectionMetadataError"></small>
+                        </div>
+                        <div class="col-md-5">
+                            <strong><label><span class="text-warning">* </span>Number of Columns to be Grouped:</label></strong>
+                            <select id="numColumns" class="form-control">
+                                <option value="">Select number of columns</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                            <small class="text-danger" id="numColumnsError"></small>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-container">
+                                <div id="dynamicFields"></div> <!-- Table will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row py-2">
+                        <div class="col-md-2">
+                            <input type="hidden" value="" id="section_header_task_id" name="section_header_task_id">
+                            <button type="button" class="btn btn-primary" id="saveMetadata"><i class="fas fa-plus-circle"></i> Create</button>
+                        </div>
+                    </div>
+
+                    <h4 class="text-center alert-primary">Grouped Header List</h4>
+                    <!-- Table to Show Configured Section Headers -->
+                    <div class="d-flex justify-content-center form_container">
+                        <div class="table-responsive" style="height:250px">
+                            <table id="manageSectionHeaderTable" class="table mt-3 table-bordered table-striped">
+                                <thead>
+                                    <tr align="center">
+                                        <th width="70px;">Sr. No.</th>
+                                        <th>Section Metadata(Column) Header Group</th>
+                                        <th width="100px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody align="center"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- manage metadata tracking modal -->
+<div class="modal fade" id="manageMetadataTrackingModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="manageMetadataTrackingModalLabel">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Metadata Tracking</h5>
+                <button id="close_manage_metadata_tracking" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% csrf_token %}
+                <div class="container">
+                    <h4 class="text-center alert-primary">Section Metadata Tracking</h4>
+                    <h6 class="text-warning">Note: (*) means required field</h6>
+                    <div class="row py-2">
+                        <div class="col-md-6">
+                            <strong><label><span class="text-warning">* </span>Section Metadata Name:</label></strong>
+                            <select id="sectionMetadataName" class="form-control"></select>
+                            <small class="text-danger" id="sectionMetadataNameError"></small>
+                        </div>
+                        <div class="col-md-6">
+                            <strong><label><span class="text-warning">* </span>Section Metadata Value:</label></strong>
+                            <select id="sectionMetadataValue" class="form-control"></select>
+                            <small class="text-danger" id="sectionMetadataValueError"></small>
+                        </div>
+
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col-md-4">
+                            <input type="hidden" value="" id="selected_row_position" name="selected_row_position">
+                            <input type="hidden" value="" id="metadata_tracking_task_id" name="metadata_tracking_task_id">
+                            <button type="button" class="btn btn-primary" id="showTrackMetadata"><i class="fas fa-plus-circle"></i> Track Metadata</button>
+                        </div>
+                    </div>
+
+                    <!-- Table to Show Metadata Tracking -->
+
+                    <div id="showMetadataTrackingDiv">
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- modal for view document -->
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="document_modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <iframe id="document_viewer" src=""></iframe>
+        </div>
+    </div>
+</div>
+
+
+<!--  Modal for project task log history-->
+<div class="modal fade" id="projectTaskLogHistoryModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="projectTaskLogHistoryTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="projectTaskLogHistoryTitle">Task History</h5>
+                <button id="close_task_log_history" type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <h4 class="text-center alert-primary">
+                        Task log history details
+                    </h4>
+                    <div class="d-flex justify-content-center">
+                        <div class="table-responsive" style="min-height:400px">
+                            <table id="projectTaskLogHistoryTable" class="table table-bordered table-striped" data-order='[[ 0, "desc" ]]' style="min-width:1050px;">
+                                <thead>
+                                    <tr>
+                                        <th>Log ID</th>
+                                        <th>Task ID</th>
+                                        <th>Log Message</th>
+                                        <th>Created By</th>
+                                        <th>Date</th>
+                                        <th>Task Log Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<nav class="navbar navbar-expand navbar-light bg-light fixed-bottom py-2">
+    <div class=" navbar-collapse" id="navbarTogglerDemo01">
+        <ul class="navbar-nav ml-5 mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+                <a style="font-size : 14px;" class="nav-link" href="#">Terms</a>
+            </li>
+
+            <li class="nav-item">
+                <a style="font-size : 14px;" class="nav-link" href="#">Support</a>
+            </li>
+
+            <li class="nav-item">
+                <a style="font-size : 14px;" class="nav-link" href="#">Help</a>
+            </li>
+
+            <li class="nav-item">
+                <a style="font-size : 14px;" class="nav-link" href="#">Privacy</a>
+            </li>
+        </ul>
+        <span  style="font-size : 12px;"> Copyright © 2020-<script>document.write(new Date().getFullYear());</script>,
+            Solviti Inc. ALL RIGHTS RESERVED
+        </span>
+    </div>
+</nav>
+
+<!-- Modal for Loading Spinner-->
+
+<div class="modal" id="loading" data-backdrop="static" data-keyboard="false" tabindex="-1"
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+          <div class="d-flex">
+              <div class="spinner-border text-warning" role="status">
+                  <span class="sr-only">Loading...</span>
+              </div>
+              <h4 class="pl-4">Please wait...</h4>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal for PDF Loading Spinner-->
+
+<div class="modal fade" id="pdf_loading" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+      <div class="card border-warning mb-3" style="max-width: 18rem;">
+          <div class="card-header">
+              <div class="spinner-border text-warning" role="status">
+                <span class="sr-only"></span>
+              </div> <span>Loading...</span>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Please wait...</h5>
+            <p class="card-text">Working on pdf file conversion.</p>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+<!-- URL QR Search Modal -->
+
+<div class="modal fade" id="urlQRCodeModal" data-backdrop="static" tabindex="-1" role="dialog"
+     aria-labelledby="urlQRCodeTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="urlQRCodeTitle">Solviti QR CODE Scanner</h5>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close"
+                    id="close_urlQRCode_btn" title="Close Camera">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mt-3" id="qr_code_alert_message"></div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="pb-0">Place your QR coded document URL in front of the camera</label>
+                    </div>
+                    <video id="url_preview"></video>
+                </div>
+            </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <button type="button" id="urlQRCodeCancel" class="btn btn-block btn-md btn-secondary urlQRCodeCancel"
+                          data-dismiss="modal" title="Close Camera">Cancel</button>
+                </div>
+              </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal for upload using camera  -->
+
+<div class="modal fade" id="uploadCameraModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="uploadCameraTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="uploadCameraTitle">Solviti Camera</h5>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" id="close_uploadCamera_btn" title="Close Camera">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mt-3" id="upload_camera_alert_message"></div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="pb-0">Place your document in front of the camera</label>
+                    </div>
+                    <video id="camera_preview"></video>
+                    <div class="btn-group mb-2 px-0" data-toggle="buttons">
+                        <label class="btn btn-primary active">
+                            <input id="start-camera" type="radio" name="options" value="1" autocomplete="off" checked> Front Camera
+                        </label>
+                        <label class="btn btn-dark" style="margin-left: 192px;">
+                            <input type="radio" name="options" value="2" autocomplete="off"> Back Camera
+                        </label>
+                    </div>
+                    <button id="click-photo">Click Photo</button>
+                    <canvas id="canvas" width="320" height="240"></canvas>
+                </div>
+            </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <button type="button" id="uploadCameraCancel" class="btn btn-block btn-md btn-secondary uploadCameraCancel" data-dismiss="modal" title="Close Camera">Cancel</button>
+                </div>
+              </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+        crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+
+<script src="{% static 'custom/js/layout.js' %}" type="text/javascript"></script>
+<script src="{% static 'project_management/js/tree_grid_view.js' %}?version=3" type="text/javascript"></script>
+<script src="{% static 'project_management/js/hide_show_column.js' %}?version=1" type="text/javascript"></script>
+<script src="{% static 'project_management/js/edit_tree_grid_row.js' %}?version=1" type="text/javascript"></script>
+<script src="{% static 'project_management/js/update_task_data.js' %}?version=1" type="text/javascript"></script>
+<script src="{% static 'project_management/js/create_update_notification.js' %}?version=1" type="text/javascript"></script>
+<script src="{% static 'project_management/js/task_attachment.js' %}?version=1" type="text/javascript"></script>
+<script src="{% static 'custom/js/download_view_document.js' %}?version=1" type="text/javascript"></script>
+<script src="{% static 'project_management/js/project_task_log_history.js' %}?version=3" type="text/javascript"></script>
+<script src="{% static 'project_management/js/editable_column_restriction.js' %}?version=1" type="text/javascript"></script>
+<script src="{% static 'project_management/js/manage_section_label.js' %}?version=1" type="text/javascript"></script>
+<script src="{% static 'project_management/js/nested_grid_view.js' %}?version=3" type="text/javascript"></script>
+<script src="{% static 'project_management/js/manage_section_metadata.js' %}?version=1" type="text/javascript"></script>
+<script src="{% static 'project_management/js/manage_section_header.js' %}?version=1" type="text/javascript"></script>
+<script src="{% static 'project_management/js/manage_metadata_tracking.js' %}?version=1" type="text/javascript"></script>
+
+<script>
+    $('#sidebarul').css('height',window.outerHeight)
+
+</script>
+
+{% block extracode %} {% endblock %}
+{% block extra_media %}
+
+{% endblock %}
+</body>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.6/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/3.3.3/adapter.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js"></script>
+<!--    <script type="text/javascript" src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>-->
+    <script src="{% static 'custom/js/qr_search_url.js' %}?version=7" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+    <script type="text/javascript" src="https://js.live.net/v7.2/OneDrive.js" id="onedrive-js"></script>
+<!--    <script src="/static/custom/js/timer.js?version=1" type="text/javascript"></script>-->
+
+    <script>
+        $(document).ready(function() {
+            $(".drag_drop a").click();
+
+            //--------------------------- sidemenu
+
+            $('li.nav-item').mouseleave('click',function(){
+              $(this).removeClass('menu-open menu-is-opening');
+             $($(this).find("ul")[0]).slideUp()
+            })
+
+            $('li.nav-item').on('click',function(){
+              $(this).toggleClass('menu-open menu-is-opening');
+              $($(this).find("ul")[0]).slideToggle()
+            })
+
+            $('.pushmenu').on('click',function(){
+              if(window.innerWidth < 750){
+                $('body').toggleClass("sidebar-open");
+                $('aside.main-sidebar').css('top','55')
+              }else{
+                $('aside.main-sidebar').css('top','55')
+                $('body').toggleClass("sidebar-closed sidebar-collapse");
+              }
+            })
+
+            $('#example').DataTable({
+                responsive: true,
+                dom: '<"toolbar"><"float-right pl-3"B>fltip',
+                ordering: false,
+                stateSave: true,
+
+                buttons: [
+                    {
+                        extend:    'copyHtml5',
+                        text:      '<img src="/static/images/copy.png" width="20" height="20"/>',
+                        titleAttr: 'Copy list to clipboard',
+                        title: 'Solviti_Export_Text'
+                    },
+                    {
+                        extend:    'excelHtml5',
+                        text:      '<img src="/static/images/xls.png" width="20" height="20"/>',
+                        titleAttr: 'Export list in Excel file format',
+                        title: 'Solviti_Export_Excel'
+                    },
+                    {
+                        extend:    'csvHtml5',
+                        text:      '<img src="/static/images/export-csv.png" width="20" height="20"/>',
+                        titleAttr: 'Export list in CSV file format',
+                        title: 'Solviti_Export_CSV'
+                    },
+                    {
+                        extend:    'pdfHtml5',
+                        text:      '<img src="/static/images/pdf.png" width="20" height="20"/>',
+                        titleAttr: 'Export list in PDF file format',
+                        title: 'Solviti_Export_PDF',
+                        orientation: 'landscape',
+                        pageSize: 'LEGAL',
+                        exportOptions: {
+                            columns: [ 0, 1, 2, 3, 4, 5 ]
+                        }
+                    },
+
+                ],
+                "language": {
+                    "search": '<i style="color:grey" class="fas fa-search" aria-hidden="true">_INPUT_</i>',
+                    "searchPlaceholder": "Filter Records",   // Placeholder for the search box
+                },
+
+            });
+
+            if(document.getElementById('search-by-meta')){
+                $("div.toolbar").html(`
+                    <h5 class="d-inline">Matching Documents List</h5><br><br>
+                    <div class="pl-3 btn-group" role="group" aria-label="First group">
+                        <button type="button" title="Download selected items" class="btn btn-outline-primary btn-sm"
+                        onclick="downloadAll('testing.docx')">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="pl-3 btn-group" role="group" aria-label="First group">
+                        <button type="button" title="Add Email Scheduler" class="btn btn-outline-primary btn-sm"
+                            onclick="openSchedulerPopup()">
+                            <i class="far fa-clock"></i>
+                        </button>
+                    </div>
+                `);
+            }
+
+            $('#alt-select-file').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $('#file-input').click()
+
+            });
+
+            $('#mobile-alt-select-file').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $('#mobile-file-input').click()
+
+            });
+
+
+        $('[data-toggle="tooltip"]').tooltip()
+
+        $('.dropzone').on('dragover dragenter dragleave dragend drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        })
+
+        $('.dropzone').on('dragover dragenter', function(e) {
+            $(this).addClass('dragover');
+        });
+
+        $('.dropzone').on('dragleave dragend', function(e) {
+            $(this).removeClass('dragover');
+        });
+
+        $(".dropzone").on('drop', function(e) {
+
+            let x = document.getElementById('file-input')
+            x.files = e.originalEvent.dataTransfer.files;
+            $('#file-help').html("");
+
+            $.each(x.files , (f) => {
+                $('#file-help').append(x.files[f].name + " </br> ")
+            });
+
+            $('#file-help').removeClass('d-none');
+
+            $('#upload-hint').html(x.files.length + " files ready to upload");
+            $('#upload-btn').removeClass('d-none')
+            $('#upload').removeClass('d-none')
+            $('#upload').removeAttr('disabled');
+            $('#merge_files').attr('disabled',true);
+
+            var e1 = document.getElementById("share-point-api");
+            e1.classList.add("link-disabled");
+
+            var e2 = document.getElementById("mobile-alt-select-file");
+            e2.classList.add("link-disabled");
+
+            var e3 = document.getElementById("googleapi");
+            e3.classList.add("link-disabled");
+
+        });
+
+        $('#file-input').on('change', function(e) {
+
+            let x = document.getElementById('file-input')
+            $('#file-help').html("");
+
+            $.each(x.files , (f) => {
+                //console.log(x.files[f].name)
+                $('#file-help').append(x.files[f].name + " </br> ")
+            });
+
+            $('#file-help').removeClass('d-none');
+
+            $('#upload-hint').html( $(this)[0].files.length + " files ready to upload");
+            $('#upload-btn').removeClass('d-none');
+            $('#upload').removeClass('d-none');
+            $('#upload').removeAttr('disabled');
+
+        });
+        $('#mobile-file-input').on('change', function(e) {
+
+            let x = document.getElementById('mobile-file-input')
+            $('#mobile-file-help').html("");
+
+            $.each(x.files , (f) => {
+                //console.log(x.files[f].name)
+                $('#mobile-file-help').append(x.files[f].name + " </br> ")
+            });
+
+            $('#mobile-file-help').removeClass('d-none');
+
+            $('#upload-hint').html( $(this)[0].files.length + " files ready to upload");
+            $('#upload-btn').removeClass('d-none');
+            $('#upload').removeClass('d-none');
+            $('#upload').removeAttr('disabled');
+        });
+
+    });
+
+    function loader(action=null){
+        if(action){
+            $('#loading').modal(action);
+        } else{
+            $('#loading').modal('hide');
+        }
+    }
+
+    function pdf_loader(action=null){
+        if(action){
+            $('#pdf_loading').modal(action);
+        } else{
+            $('#pdf_loading').modal('hide');
+        }
+    }
+
+    $(".mul-select").select2({
+        placeholder: "Click here to select options.",
+        closeOnSelect: true,
+        tags: false,
+        allowClear: true,
+        multiple: true,
+        tokenSeparators: ['/',',',';'," "],
+    });
+
+    $(".mul-select-email").select2({
+        placeholder: "Click here to select options.",
+        closeOnSelect: true,
+        tags: true,
+        allowClear: true,
+        multiple: true,
+        tokenSeparators: ['/',',',';'," "],
+    });
+
+    $(".mul-select-users").select2({
+        placeholder: "Click here to select users that are notified.",
+        closeOnSelect: true,
+        tags: false,
+        allowClear: true,
+        multiple: true,
+        tokenSeparators: ['/',',',';'," "],
+    });
+
+    $(".selectpicker").select2({
+      tags: true
+    });
+    $(".auto-increment").select2({
+      tags: false
+    });
+    $(".pa-master-metadata").select2({
+      tags: true,
+    });
+    $(".ch-master-metadata").select2({
+      tags: false
+    });
+    $(".choice-master-metadata").select2({
+      tags: false
+    });
+    $(".select2-physical-location").select2({
+        tags: false,
+        placeholder: "Please Select Document Name",
+        closeOnSelect: false,
+        allowClear: true,
+        multiple: true,
+        tokenSeparators: ['/',',',';'," "],
+    });
+    $(".select-to-select2").select2({
+        placeholder: "Please Select Your Choice",
+        tags: true,
+        closeOnSelect: true,
+        allowClear: true,
+        multiple: false,
+    });
+    $(".notify-other-email-select").select2({
+        placeholder: "Click here to select options.",
+        closeOnSelect: true,
+        tags: true,
+        allowClear: true,
+        multiple: true,
+        tokenSeparators: ['/',',',';'," "],
+    });
+
+    </script>
+    <!-- Load jQuery UI after jQuery -->
+    <script src="/static/assets/plugins/jquery-ui/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
+
+</html>
+
+{% block extrajs %}
+{% endblock %}

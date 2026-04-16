@@ -1,0 +1,106 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+
+<style>
+    .swal2-popup-custom {
+        width: 25em !important;
+        padding: 0.25em !important;
+        font-size: 0.9rem !important;
+    }
+    .swal2-icon.swal2-error {
+        border-color: #dc3545 !important;
+        color: #dc3545 !important;
+    }
+    .swal2-styled.swal2-cancel {
+        border-radius: 1.25em !important;
+        font-size: 1em !important!;
+    }
+    .swal2-styled.swal2-confirm {
+        border-radius: 1.25em !important;
+        font-size: 1em !important!;
+    }
+    .swal2-popup {
+        width:21em;
+    }
+</style>
+<style>
+    .buttons-html5 {
+        padding:1px 6px !important;
+    }
+</style>
+
+<!-- projects archive table start -->
+<div class="container">
+    <div class="row" style="padding-top:20px; padding-left:15px;">
+        <a onclick="loader('show')" title="Click here to view project dashboard" href="/project-management/project-card-view/"><button class="btn btn-outline-primary">Projects Dashboard</button></a>
+        <a onclick="loader('show')" title="Click here to create project" class="pl-2" href="{% url 'create-new-project' %}"><button class="btn btn-outline-primary">Create Project</button></a>
+        <a onclick="loader('show')" title="Click here to view deleted projects" class="pl-2" href="/project-management/projects-deleted/"><button class="btn btn-outline-primary">Deleted Projects</button></a>
+        <a onclick="loader('show')" title="Click here to view archived projects" class="pl-2" href="/project-management/projects-archive/"><button class="active btn btn-outline-primary">Archived Projects <i class="fas fa-angle-double-down"></i></button></a>
+        <a onclick="loader('show')" title="Click here to view deleted tasks" class="pl-2" href="/project-management/deleted-tasks/"><button class="btn btn-outline-primary">Deleted Tasks</button></a>
+        {% if user.is_staff or user.is_superuser or user.username == 'vspladmin' %}
+            <a onclick="loader('show')" title="Click here to Manage Section Master" class="pl-2" href="/project-management/manage-section-master/"><button class="btn btn-outline-primary">Manage Section Master</button></a>
+        {% endif %}
+    </div>
+    <hr>
+	<div class="d-flex justify-content-center pt-3">
+        <div class="user_card" style="width:150vw;">
+            <div class="d-flex justify-content-left">
+                <h5 id="form-title">Archived Projects List</h5>
+            </div>
+            <div class="d-flex justify-content-center form_container">
+                <div class="table-responsive" style="height:700px">
+                    <table id="example" class="table table-bordered table-striped" data-order='[[ 0, "desc" ]]'>
+                        <thead>
+                            <tr align="center">
+                            <th>Project ID</th>
+                            <th>Project Name</th>
+                            <th>Project Groups</th>
+                            <th>Created By</th>
+                            <th width="50">Status</th>
+                            <th>Start Date</th>
+                            <th>Due Date</th>
+                            <th width="80">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in archive_project_obj_list %}
+                            <tr>
+                                <td>{{ item.proj_id }}</td>
+                                <td style ="word-break:break-all;">{{ item.proj_name }}</td>
+                                <td>{{ item.proj_doc_display_group }}</td>
+                                <td>{{ item.proj_owner.username }}</td>
+                                <td class="text-danger"><i class="fas fa-archive pr-1"></i>Archive</td>
+                                <td>{{ item.proj_start_date | timezone:time_zone}}</td>
+                                <td>{{ item.proj_end_date | timezone:time_zone}}</td>
+                                <td align="center">
+                                    <button type="button" title="Restore archive project" class="btn btn-success btn-sm"
+                                            onclick="restoreArchiveProject('{{ item.proj_id }}')">
+                                        <i class="fas fa-sync-alt"></i> Restore
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<!-- projects archive table end -->
+
+
+{% endblock %}
+{% block extracode %}
+	<script src="{% static 'project_management/js/restore_archive_project.js' %}?version=1" type="text/javascript"></script>
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

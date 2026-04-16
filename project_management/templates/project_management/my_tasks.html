@@ -1,0 +1,142 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'treegrid/codebase/treegrid.css' %}">
+<style>
+	.buttons-html5 {
+        padding:1px 6px !important;
+    }
+    hr {
+    	margin-top:0.5rem;
+    	margin-bottom:0.5rem;
+    }
+</style>
+
+
+<!-- my tasks table start -->
+
+<div class="containerd-flex justify-content-start" style="padding-top:20px; padding-left:120px;">
+	<div class="row">
+		<i class="fas fa-tasks ml-3 pt-1 fa-2x text-dark"></i><h3 class="text-dark pl-2">My Tasks</h3>
+	</div>
+	<hr>
+	<div class="row pt-3">
+		<div class="col">
+			<div class="row">
+				<i class="fas fa-calendar-day text-danger ml-3 pt-2 fa-lg"></i><h4 class="text-danger pl-2">Do today:</h4>
+		  	</div>
+			<br>
+			<table id="do_today_table" class="table table-bordered table-striped" data-order='[[ 4, "asc" ]]'>
+				<thead>
+					<tr align="center">
+						<th>Task ID</th>
+						<th>Task name</th>
+						<th>Project name</th>
+						<th>Task start date</th>
+						<th>Task due date</th>
+						<th>Task status</th>
+						<th>Task priority</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for task in do_today_task_list %}
+					<tr align="center">
+						<td>{{ task.id }}</td>
+						<td align="left"><a title="Click here to do changes in this task" href="/project-management/tree-grid-view/{{task.project.proj_id}}/">{{ task.text }}</a></td>
+						<td align="left">{{ task.project.proj_name }}</td>
+						<td>{{ task.start_date|timezone:time_zone|date:'d/m/Y' }}</td>
+						<td>{{ task.end_date|timezone:time_zone|date:'d/m/Y' }}</td>
+						{% if task.status.task_status == 'Completed' %}
+							<td class="text-dark">{{ task.status.task_status }}</td>
+						{% elif task.status.task_status == 'In Progress' %}
+							<td class="text-success">{{ task.status.task_status }}</td>
+						{% elif task.status.task_status == 'Not Started' %}
+							<td class="text-dark">{{ task.status.task_status }}</td>
+						{% elif task.status.task_status == 'On Hold' %}
+							<td class="text-danger">{{ task.status.task_status }}</td>
+						{% else %}
+							<td class="text-secondary">{{ task.status.task_status }}</td>
+						{% endif %}
+						{% if task.priority.task_priority == 'High' %}
+							<td class="text-danger">{{ task.priority.task_priority }}</td>
+						{% elif task.priority.task_priority == 'Medium' %}
+							<td class="text-dark">{{ task.priority.task_priority }}</td>
+						{% elif task.priority.task_priority == 'Low' %}
+							<td class="text-success">{{ task.priority.task_priority }}</td>
+						{% else %}
+							<td class="text-secondary">{{ task.priority.task_priority }}</td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col">
+			<div class="row">
+				<i class="fas fa-calendar-times text-success ml-3 pt-2 fa-lg"></i><h4 class="text-success pl-2">Do later:</h4>
+		  	</div>
+			<br>
+			<table id="do_later_table" class="table table-bordered table-striped" data-order='[[ 4, "asc" ]]'>
+				<thead>
+					<tr align="center">
+						<th>Task ID</th>
+						<th>Task name</th>
+						<th>Project name</th>
+						<th>Task start date</th>
+						<th>Task due date</th>
+						<th>Task status</th>
+						<th>Task priority</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for task in do_later_task_list %}
+					<tr align="center">
+						<td>{{ task.id }}</td>
+						<td align="left"><a title="Click here to do changes in this task" href="/project-management/tree-grid-view/{{task.project.proj_id}}/">{{ task.text }}</a></td>
+						<td align="left">{{ task.project.proj_name }}</td>
+						<td>{{ task.start_date|timezone:time_zone|date:'d/m/Y' }}</td>
+						<td>{{ task.end_date|timezone:time_zone|date:'d/m/Y' }}</td>
+						{% if task.status.task_status == 'Completed' %}
+							<td class="text-dark">{{ task.status.task_status }}</td>
+						{% elif task.status.task_status == 'In Progress' %}
+							<td class="text-success">{{ task.status.task_status }}</td>
+						{% elif task.status.task_status == 'Not Started' %}
+							<td class="text-dark">{{ task.status.task_status }}</td>
+						{% elif task.status.task_status == 'On Hold' %}
+							<td class="text-danger">{{ task.status.task_status }}</td>
+						{% else %}
+							<td class="text-secondary">{{ task.status.task_status }}</td>
+						{% endif %}
+						{% if task.priority.task_priority == 'High' %}
+							<td class="text-danger">{{ task.priority.task_priority }}</td>
+						{% elif task.priority.task_priority == 'Medium' %}
+							<td class="text-dark">{{ task.priority.task_priority }}</td>
+						{% elif task.priority.task_priority == 'Low' %}
+							<td class="text-success">{{ task.priority.task_priority }}</td>
+						{% else %}
+							<td class="text-secondary">{{ task.priority.task_priority }}</td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- my tasks table end -->
+
+
+{% endblock %}
+{% block extracode %}
+	<script src="{% static 'project_management/js/my_tasks.js' %}?version=1" type="text/javascript"></script>
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

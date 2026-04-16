@@ -1,0 +1,87 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+
+<style>
+    div.scroll {
+        margin:4px, 4px;
+        padding:4px;
+        max-height: 300px;
+        max-width: 1170px;
+        overflow-x: auto;
+        overflow-y: auto;
+        text-align:justify;
+    }
+</style>
+<style>
+    .buttons-html5 {
+        padding:1px 6px !important;
+    }
+    main {
+        background-color: white;
+    }
+    .table td, .table th {
+        padding:0.2rem;
+    }
+</style>
+
+<!-- view upload csv file table start -->
+<div class="container">
+	<div class="d-flex justify-content-center pt-3">
+        <div class="user_card" style="width:150vw;">
+            <form action="{% url 'save-upload-csv-file' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="path" value="{{ path }}">
+                <p class="text-warning ml-1" style="margin-top:5px;">(<b>Note:</b> This is only an approximate representation of your csv file.)</p>
+                <div class="ml-1">
+                    <h5 id="form-title">Project name: {{ proj_name }}</h5>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="table-responsive scroll" style="height:700px">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr align="center">
+                                    {% for h in new_header %}
+                                        <th>{{ h }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for row in data %}
+                                <tr>
+                                    {% for cell in row %}
+                                        <td style ="word-break:break-all; min-width:100px;">{{ cell }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div><br>
+                <div class="row">
+                    <div class="col-2 ml-1">
+                        <button class="btn btn-block btn-outline-primary" name="save_upload" type="submit" style="padding:0; font-size: 1.1rem;">Go to project</button>
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-block btn-outline-secondary" name="cancel_upload" type="submit" style="padding:0; font-size: 1.1rem;">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- view upload csv file table end -->
+
+
+{% endblock %}
+{% block extracode %}
+
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

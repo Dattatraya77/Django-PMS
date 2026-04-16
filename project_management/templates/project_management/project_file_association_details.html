@@ -1,0 +1,413 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+
+{% block css %}
+    .container-fluid {
+        padding-right: 15px !important;
+        padding-left: 0px !important;
+    }
+
+    .dropzone {
+        min-height: 160px;
+        background: white;
+        padding: 25px 54px;
+        border: 2px dashed #0087F7;
+        border-radius: 5px;
+    }
+
+    .dragover {
+        border-color: black;
+        background-color: whitesmoke;
+        box-shadow: inset 0px 0px 15px 0px #5252527d;
+    }
+
+    .buttons-html5 {
+        padding:1px 6px !important;
+    }
+
+    .selected-file-chip{
+        font-size: 15px;
+        padding: 5px 10px;
+        border-radius: 15px;
+        max-height: 100px;
+        overflow: scroll;
+        text-align: left;
+        font-weight: 500;
+    }
+
+    .btn-upload-associate{
+        padding:0.25rem -0.5rem;
+        line-height:1.5;
+        border-radius:1.2rem;
+        font-size: 13px;
+        margin-top:0px;
+        width:200px;
+        margin-left:60px;
+    }
+    .dropdown-menu {
+        min-width:15rem;
+        padding:0.3rem 2px;
+        margin:0.125rem -123px 0px;
+        height:180px;
+        overflow: auto;
+    }
+    .select2-container {
+        min-width: 395px;
+    }
+    .select2-results__options{
+        font-size:14px !important;
+    }
+    .select2-results__placeholders{
+        font-size:11px !important;
+    }
+    .select2-container--default.select2-container--disabled .select2-selection--multiple {
+        background-color: #d0ffd0;
+    }
+    .select2-container .select2-selection--single {
+        height:30px!important;
+    }
+    .swal2-popup-custom {
+        width: 25em !important;
+        padding: 0.25em !important;
+        font-size: 0.9rem !important;
+    }
+    .swal2-icon.swal2-error {
+        border-color: #dc3545 !important;
+        color: #dc3545 !important;
+    }
+    .swal2-styled.swal2-cancel {
+        border-radius: 1.25em !important;
+        font-size: 1em !important!;
+    }
+    .swal2-styled.swal2-confirm {
+        border-radius: 1.25em !important;
+        font-size: 1em !important!;
+    }
+    div.scroll {
+        margin:4px, 4px;
+        padding:4px;
+        background-color: steel;
+        width: 450px;
+        max-height: 250px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align:justify;
+    }
+    .table td, .table th {
+        padding:0.2rem;
+        vertical-align:middle!important;
+    }
+    .round {
+        position: relative;
+    }
+    .round label {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        cursor: pointer;
+        height: 20px;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 20px;
+    }
+    .round label:after {
+        border: 2px solid #fff;
+        border-top: none;
+        border-right: none;
+        content: "";
+        height: 5px;
+        left: 4px;
+        opacity: 0;
+        position: absolute;
+        top: 5px;
+        transform: rotate(-45deg);
+        width: 10px;
+    }
+    .round input[type="checkbox"] {
+        visibility: hidden;
+    }
+    .round input[type="checkbox"]:checked + label {
+        background-color: #66bb6a;
+        border-color: #66bb6a;
+    }
+    .round input[type="checkbox"]:checked + label:after {
+        opacity: 1;
+    }
+    .btn-outline-danger {
+        border-color: white;
+    }
+    .alert {
+        padding: 0.5rem 1rem;
+        margin-bottom: -1rem
+    }
+    .input-group-text {
+        inline-size: 150px;
+        overflow-wrap: break-word;
+        display:block;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+        padding:0.275rem 0.75rem;
+    }
+    .outer-cont {
+        margin-left:60px;
+        max-width:1300px;
+    }
+    .tab-content {
+        max-width:1250px;
+    }
+
+{% endblock %}
+{% block content %}
+
+<div class="container outer-cont">
+    <div class="row border mt-5 py-2 mx-1" style="max-height:80vh; overflow-y:auto;">
+        <div class="col">
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-projectFileAssociation" role="tabpanel" aria-labelledby="pills-projectFileAssociation-tab">
+                    <div class="card card-primary card-tabs">
+                        <div class="card-header pl-3 pt-2"><h4>Project name: {{ project_name }}</h4></div>
+                        <div class="card-header p-0 pt-1">
+
+                            <ul class="nav nav-pills" id="myTab" role="tablist">
+                                <li class="pt-2 px-3"><h4 class="card-title">Manage files</h4></li>
+                                <li class="nav-item ">
+                                    <a onclick="project_upload_associate_file('{{ proj_id }}')" class="nav-link border-light ml-1" id="projectUploadAssociate-tab" data-toggle="pill" href="#projectUploadAssociate" role="tab" aria-controls="projectUploadAssociate" aria-selected="false" title="Upload & Associate"><i class="fas fa-upload"></i> Upload & Associate</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link border-light ml-1" id="project-associate-existing-file-tab" data-toggle="pill" href="#project-associate-existing-file" role="tab" aria-controls="project-associate-existing-file" aria-selected="false" title="Associate Existing File"><i class="fas fa-angle-double-right"></i> Associate existing file(s) to project</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content" id="custom-tabs-two-tabContent">
+                                <div class="tab-pane fade show active" id="projectAssociatedFiles" role="tabpanel" aria-labelledby="projectAssociatedFiles-tab">
+                                    <div class="d-flex justify-content-center">
+                                        <div class="user_card">
+                                            <div class="d-flex justify-content-left">
+                                                <h5 id="form-title">Project associated file list</h5>
+                                            </div><br>
+                                            <div class="d-flex justify-content-center form_container">
+                                                <div class="table-responsive" style="height:250px">
+                                                    <table id="projectAssociatedListTable" class="table table-bordered table-striped" data-order='[[ 1, "desc" ]]' style="min-width:1000px;">
+                                                        <thead>
+                                                            <tr align="center">
+                                                                <th style="width:5px;" id="th_sorting">
+                                                                    <a href="#" id="project_remove_association" title="Remove Association">
+                                                                        <i class="far fa-trash-alt text-danger"></i>
+                                                                    </a>
+                                                                </th>
+                                                                <th id="th_sortFileId">File ID</th>
+                                                                <th>File Name</th>
+                                                                <th>File Groups</th>
+                                                                <th>File Type</th>
+                                                                <th>Created By</th>
+                                                                <th>Updated On</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody align="center">
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="projectUploadAssociate" role="tabpanel" aria-labelledby="projectUploadAssociate-tab">
+                                    <div class="container-fluid p-0" >
+                                        <form method="post"  enctype="multipart/form-data" novalidate="" class="box has-advanced-upload" id="myForm">
+                                            {% csrf_token %}
+                                            <div class="row justify-content-center">
+                                                <div class="col-12 text-center mt-2">
+                                                    <h5 style="font-weight: bold;">Single & Multiple Files Associate</h5><h6 class="mt-2" id="upload-hint">All file formats supported except audio/video</h6>
+                                                </div>
+
+                                                <div class="col-lg-9 dropzone" id="dropzone">
+                                                    <div class="row justify-content-center h-100">
+                                                        <div class="col-md-2 col-lg-2 col-sm-12 my-auto">
+                                                            <i class="fas fa-file-upload fa-4x text-primary"></i>
+                                                        </div>
+
+                                                        <div class="col-10 text-center my-auto">
+
+                                                            <img src="/media/profile_pics/file_upload_arrow.png" alt="" width="30px" class="d-inline mr-2">
+                                                            <p class="mt-4 d-inline">Drag & Drop your files <br> or <br><i class='fas fa-desktop' style='font-size:30px' ></i><a href="#" id="alt-select-file"> Attach files from computer</a></p>
+                                                            <input type="file" name="files" id="file-input" class="form-control p-1 d-none" multiple>
+                                                            <br>
+                                                            <div class="selected-file-chip d-none" id="file-help"></div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                            <div class="box__uploading">Uploading…</div>
+                                            <div class="box__success">Done! <a href="{% url 'home' %}" class="box__restart" role="button">Upload more?</a></div>
+                                            <div class="box__error">Error! <span></span>. <a href="{% url 'home' %}" class="box__restart" role="button">Try again!</a></div>
+                                            <input type="hidden" name="ajax" value="1">
+
+                                            <div class="mx-5 pt-3" id="alert_wrapper"></div>
+                                            {% if proj_associated_metaplan_list|length > 0 %}
+                                                <br><br>
+                                                <h5 style="font-weight: bold;" class="d-flex justify-content-left pb-2">Please enter metadata values:</h5>
+                                                <div class="row">
+                                                    {% for item in proj_associated_metaplan_list %}
+                                                        {% if item.type == 'textarea' %}
+                                                            <div class="col-sm-6">
+                                                                <div class="input-group mb-3">
+                                                                    <span  class="input-group-text name" style="font-size: 14px; height:40px; background: rgba(0,0,0,.03); color: black;">{{ item.description }}</span>
+                                                                    <textarea  class="form-control border-primary" name="{{ item.key_name }}" aria-label="With textarea" placeholder="{{ item.description }}" style="font-size: 14px; height:40px;"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        {% elif item.type == 'bool' %}
+                                                            <div class="col-sm-6">
+                                                                <div class="input-group mb-3" style="height:30px;">
+                                                                    <div class="input-group-prepend">
+                                                                      <div class="input-group-text" style="font-size: 14px; height:30px; background: rgba(0,0,0,.03); color: black;">{{ item.description }}</div>
+                                                                    </div>
+                                                                    <select name="{{ item.key_name }}" class="form-control border-primary" style="font-size: 14px; height:30px;">
+                                                                        <option value="" selected>BLANK</option>
+                                                                        <option value="True">True</option>
+                                                                        <option value="False">False</option>
+                                                                        <option value="Yes">Yes</option>
+                                                                        <option value="No">No</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="col-sm-6">
+                                                                <div class="input-group mb-3">
+                                                                    <div class="input-group-prepend">
+                                                                        <div class="input-group-text name" style="font-size: 14px; height:30px; background: rgba(0,0,0,.03); color: black;">{{ item.description }}</div>
+                                                                    </div>
+                                                                    {% if item.type == "number" %}
+                                                                        <input type="{{ item.type }}" name="{{ item.key_name }}" class="form-control border-primary" placeholder="{{ item.description }}" step="0.0000001" style="font-size: 14px; height:30px;">
+                                                                    {% elif item.type == 'choice' %}
+                                                                    <select name="{{ item.key_name }}" class="form-control border-primary" style="font-size: 14px; height:30px;">
+                                                                        <option value=" " selected>BLANK</option>
+                                                                        {% for choice in item.meta_key_choice %}
+                                                                            <option value="{{ choice.meta_choice }}">{{ choice.meta_choice }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                    {% else %}
+                                                                        <input type="{{ item.type }}" name="{{ item.key_name }}" class="form-control border-primary" placeholder="{{ item.description }}" style="font-size: 14px; height:30px;">
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            <br>
+                                            <div class="my-auto d-flex justify-content-center" id="upload-btn">
+                                                <button disabled class="btn btn-upload-associate btn-block btn-outline-primary" type="submit" id="upload" style="padding:0; font-size: 1.1rem;">Upload & Associate</button>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="project-associate-existing-file" role="tabpanel" aria-labelledby="project-associate-existing-file-tab">
+                                    <div id="associate_file_alert_wrapper"></div>
+                                    <div class="d-flex justify-content-left">
+                                        <h5>Option 1: Type the file id below & click Associate</h5>
+                                    </div>
+                                    <div class="row mb-5">
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" id="typeFileId" placeholder="File id here">
+                                        </div>
+                                        <div class="col-2">
+                                            <button type="button" id="saveAssociateFile" class="btn btn-primary" disabled>Associate</button>
+                                            <input type="hidden" id="getAssociateFileId" value="">
+                                        </div>
+                                        <div class="col-8 mt-1">
+                                            <div id="fileStatus"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h5>Option 2: Browse & Associate</h5>
+                                        <a class="btn btn-primary mb-2" onclick="project_associate_existing_file('{{ proj_id }}')">Associate Existing Files</a>
+                                    </div>
+                                    <div id="existing_file_alert_wrapper"></div>
+                                    <div class="d-flex justify-content-left">
+                                        <h5 style="display:none;" id="existingFileHeader">Existing File List</h5>
+                                    </div><br>
+                                    <div class="table-responsive">
+                                        <table id="documentAssociateTable" class="table table-bordered table-striped d-none" data-order='[[ 2, "desc" ]]'>
+                                            <thead>
+                                                <tr align="center">
+                                                    <th style="width:5px;">#</th>
+                                                    <th>File Name</th>
+                                                    <th>File ID</th>
+                                                    <th>File Groups</th>
+                                                    <th>File Type</th>
+                                                    <th>Created By</th>
+                                                    <th>Updated On</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody align="center">
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="row pt-3 d-none" id="saveAssociateDiv">
+                                        <div class="col-sm-1 pt-2">
+                                            <input type="hidden" name="{{ proj_id }}" id="projectAssociateFileID" value="{{ proj_id }}">
+                                            <button class="btn btn-primary" type="button" id="save_value">Associate</button>
+                                        </div>
+                                        <div class="col-sm-11 pt-2" id="alert_associate_table"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal for view document -->
+
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="document_modal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <iframe id="document_viewer" src=""></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- Metadata QR Code Signature Modal -->
+{% include "bootstrapQRModals.html" %}
+
+{% endblock %}
+
+{% block extracode %}
+    <script src="{% static 'custom/js/download_view_document.js' %}?version=1" type="text/javascript"></script>
+    <script src="{% static 'custom/js/send_email.js' %}?version=1" type="text/javascript"></script>
+    <script src="{% static 'custom/js/document_History.js' %}?version=1" type="text/javascript"></script>
+    <script src="{% static 'custom/js/replace_document.js' %}?version=1" type="text/javascript"></script> 
+    <script src="{% static 'custom/js/attach_file_from_server.js' %}?version=1" type="text/javascript"></script>
+    <script src="{% static 'project_management/js/project_upload_associate_file.js' %}?version=1" type="text/javascript"></script>
+    <script>
+        $(document).ready(function() {
+            const proj_id = "{{ proj_id }}";
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+
+<style>
+
+</style>
+
+{% block content %}
+<div class="container pt-4">
+    <div class="d-flex justify-content-between">
+        <h4 style="margin-left:100px;">Create Project Field</h4>
+        <span style="margin-right:100px;">
+            <a href="#" data-toggle="modal" data-target="#fieldChoiceOptionModal" class="btn btn-primary btn-sm pr-2">Create Field Choice</a>
+        </span>
+    </div>
+
+    <hr>
+    <form action="" method="post" id="projFieldForm" style="max-width:82%; margin-left:100px;">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-header">
+                Add Field Details
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4 col-md-12">
+                        <div class="form-group">
+                            <label for="proj_field_title">Field title</label>
+                            <input placeholder="Field title" type="text" id="proj_field_title" name="proj_field_title" required class="form-control">
+                            <br>
+                            <span id="projFieldErrorMsg"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-12">
+                        <div class="form-group">
+                            <label for="proj_field_description">Field description</label>
+                            <input placeholder="Field description" type="text" id="proj_field_description" name="proj_field_description" required class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12">
+                        <div class="form-group">
+                            <label for="proj_field_type">Field type</label>
+                            <select name="proj_field_select" id="proj_field_type" required class="form-control">
+                                {% for type in field_types %}
+                                    <option value="{{ type }}">{{ type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scroll form-group" id="proj_field_choice_div" hidden>
+                    <label for="proj_field_choices">Field Choices</label><br>
+                    <select class="proj-field-multi-select" name="proj_field_select_choices" id="proj_field_choices">
+                        {% for field in field_choices %}
+                            <option value="{{ field.f_choice }}" class="form-control">{{ field.f_choice }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <button type="submit" class="btn btn-md btn-primary" id="create_proj_field"><i class="fas fa-plus-circle"></i> Create field</button>
+                        <a href="{% url 'create-project-field' %}" class="btn btn-info btn-search mr-2">
+                            <i class="fas fa-sync pr-2"></i> Reset
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <!-- Create Field Choice Options Modal -->
+    <form action="#" method="post" id="fieldChoiceOptionForm">
+        {% csrf_token %}
+        <div class="modal fade" id="fieldChoiceOptionModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="fieldChoiceOptionTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="fieldChoiceOptionTitle">Create Field Choice</h5>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close" title="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="field_choice_alert_wrapper"></div>
+                            <div class="input-group pb-4 mr-sm-4">
+                                <input type="text" name="field_choices_name" id="typeFieldChoices" class="form-control" placeholder="Please enter field choices">
+                            </div>
+
+                            <div id="fieldChoiceStatus"></div>
+                        </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <button type="button" id="fieldChoiceSave" class="btn btn-block btn-md btn-primary" disabled>Save</button>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-block btn-md btn-secondary" data-dismiss="modal" title="Close">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+{% block extrajs %}
+    <script src="{% static 'project_management/js/create_project_field.js' %}?version=1" type="text/javascript"></script>
+    <script src="{% static 'project_management/js/create_field_choice.js' %}?version=1" type="text/javascript"></script>
+{% endblock %}
+

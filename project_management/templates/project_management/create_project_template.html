@@ -1,0 +1,225 @@
+{% extends "layout1.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<style>
+    .select2-container .select2-selection--single {
+        width:210px;
+    }
+    .select2-container--default .select2-selection--multiple {
+        width:210px;
+    }
+    .gridStyle {
+        display: flex;
+        flex-flow: row wrap;
+    }
+    .gridStyle li {
+        margin: 15px;
+    }
+    .select2-container--default .select2-selection--multiple {
+        width:350px;
+    }
+
+</style>
+    <div class="container">
+        <div class="row d-flex justify-content-start pt-2 pl-3">
+            <h3 class="text-secondary">Create a new template</h3>
+        </div>
+        <hr>
+        <div>
+            <form action="" method="post" id="projectTemplateForm">{% csrf_token %}
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="temp_title">Template Title</label>
+                            <input type="text" id="temp_title" name="temp_title" class="form-control">
+                        </div>
+                        <span id="tempTitleErrorMsg"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="temp_description">Template Description</label>
+                          <textarea name="temp_description" id="temp_description" cols="30" rows="5" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                        {% if user_groups %}
+                            <label class="pb-2">Template Groups:</label>
+                            <div class="scroll form-group">
+                                <select multiple class="project-template-group-select form-control" name="group_select" id="temp_group">
+                                    {% for group in user_groups %}
+                                    <option value="{{ group.name }}" class="form-control">{{ group.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <ul class="nav nav-pills mb-3" id="add-field-pills-tab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="pills-create-new-tab" data-toggle="pill" href="#pills-create-new" role="tab" aria-controls="pills-create-new" aria-selected="true">Create new field</a>
+                                </li>&nbsp;&nbsp;
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="pills-choose-from-library-tab" data-toggle="pill" href="#pills-choose-from-library" role="tab" aria-controls="pills-choose-from-library" aria-selected="false">Choose field from library</a>
+                                </li>
+
+                            </ul>
+                            <div class="tab-content" id="pills-tabContent">
+                                <div class="tab-pane fade show active" id="pills-create-new" role="tabpanel" aria-labelledby="pills-home-tab">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Add field details
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-lg-4 col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="field_title">Field title</label>
+                                                        <input required type="text" id="field_title" name="field_title" placeholder="Field title" class="form-control">
+                                                        <br>
+                                                        <span id="fieldErrorMsg"></span>
+                                                    </div>
+                                                 </div>
+                                                <div class="col-lg-4 col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="field_description">Field description</label>
+                                                        <input type="text" id="field_description" placeholder="Field description" name="field_description" class="form-control">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="field_type">Field type</label>
+                                                        <select name="field_select" id="field_type" required class="form-control">
+                                                            {% for type in field_types %}
+                                                                <option value="{{ type }}">{{ type }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" id="field_choice_div" hidden>
+                                                <div class="col-lg-4 col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="field_choices">Field Choices</label>
+                                                        <select class="field-multi-select" id="field_choices">
+                                                            <option id="-2" value=""></option>
+                                                            {% for field in field_choices %}
+                                                                <option value="{{ field.f_choice }}" class="form-control">{{ field.f_choice }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col">
+                                                    <button onclick="add_field_values()" type="button" class="btn btn-md btn-primary" id="add_field"><i class="fas fa-plus-circle"></i> Create field</button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="tab-pane fade" id="pills-choose-from-library" role="tabpanel" aria-labelledby="pills-profile-tab">
+
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Add field details
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-lg-4 col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="library_field_choices">Field Choices</label>
+                                                        <select class="library-field-choices-select" id="library_field_choices" onchange="changeFunc();">
+                                                            <option id="-1" value="">Click here to select options.</option>
+                                                            {% for field in project_fields %}
+                                                                <option value="{{ field }}" class="form-control">{{ field }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <span id="fieldSelectErrorMsg"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col">
+                                                    <button onclick="add_library_field_values()" type="button" class="btn btn-md btn-primary"><i class="fas fa-plus-circle"></i> Create field</button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <ul class="gridStyle" id="fields"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                      <button onclick="save_field_values()" type="button" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create template</button>
+                    </div>
+                </div>
+                <br>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extracode %}
+
+<script>
+    $(document).ready(function(){
+        $(".project-template-group-select").select2({
+            placeholder: "Click here to select options.",
+            closeOnSelect: true,
+            tags: false,
+            allowClear: true,
+            multiple: true,
+            tokenSeparators: ['/',',',';'," "],
+        });
+        $(".library-field-choices-select").select2({
+            placeholder: "Click here to select options.",
+            closeOnSelect: true,
+            tags: false,
+            allowClear: true,
+            multiple: false,
+        });
+        $(".field-multi-select").select2({
+            placeholder:"Click here to select options.",
+            closeOnSelect: true,
+            tags: true,
+            allowClear: true,
+            multiple: true,
+            dropdownAutoWidth : true,
+            width: 'auto',
+            tokenSeparators: ['/',',',';'," "],
+        });
+    });
+    </script>
+    <script src="{% static 'project_management/js/create_project_template.js' %}?version=7" type="text/javascript"></script>
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

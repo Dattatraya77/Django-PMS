@@ -1,0 +1,17 @@
+
+# LOCAL Postgres Database settings
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django_tenants.postgresql_backend',
+        "NAME": 'PMS_DB',
+        'USER': 'postgres',
+        'PASSWORD': 'root',
+        'HOST': "localhost",
+        'PORT': "5432",
+    }
+}
+
+
+
+
