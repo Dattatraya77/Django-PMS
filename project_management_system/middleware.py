@@ -21,7 +21,7 @@ class TenantTutorialMiddleware(MiddlewareMixin):
                 "127.0.0.1",
                 "localhost",
                 "pms",
-                "18.212.211.145",
+                "54.145.25.69",
             ) or hostname.endswith(".nip.io"):
                 request.urlconf = settings.PUBLIC_SCHEMA_URLCONF
                 return
