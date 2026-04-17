@@ -2,12 +2,14 @@
 
 echo "Creating virtual environment..."
 
-cd /home/ubuntu/Django-PMS
+cd $WORKSPACE
 
-echo "Activating virtual environment..."
+python3 -m venv venv
 
 source venv/bin/activate
 
-echo "Collect static files..."
+pip install --upgrade pip
+pip install -r requirements.txt
 
+python manage.py migrate
 python manage.py collectstatic --noinput
