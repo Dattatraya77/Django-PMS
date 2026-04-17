@@ -4,12 +4,10 @@ echo "Creating virtual environment..."
 
 cd $WORKSPACE
 
-python3 -m venv venv
-
 source venv/bin/activate
 
-pip install --upgrade pip
-pip install -r requirements.txt
+echo "collecting static files..."
 
-python manage.py migrate
 python manage.py collectstatic --noinput
+
+echo "Completed collecting static files..."
