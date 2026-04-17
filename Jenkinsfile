@@ -20,5 +20,32 @@ pipeline {
                 '''
             }
         }
+
+        stage('Setup Gunicorn') {
+            steps {
+                sh '''
+                chmod +x gunicorn.sh
+                ./gunicorn.sh
+                '''
+            }
+        }
+
+        stage('Setup NGINX') {
+            steps {
+                sh '''
+                chmod +x nginx.sh
+                ./nginx.sh
+                '''
+            }
+        }
+
+        stage('Restart Services') {
+            steps {
+                sh '''
+                sudo systemctl restart gunicorn
+                sudo systemctl restart nginx
+                '''
+            }
+        }
     }
 }
