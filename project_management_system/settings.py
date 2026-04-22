@@ -11,14 +11,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+from decouple import config
 from pathlib import Path
-from decouple import Config, RepositoryEnv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-ENV_FILE = os.environ.get("ENV_FILE", ".env.local")
-
-config = Config(RepositoryEnv(os.path.join(BASE_DIR, ENV_FILE)))
 
 ENVIRONMENT = config("ENVIRONMENT", default="local")
 
@@ -26,6 +21,7 @@ if ENVIRONMENT == "local":
     from .local_setting import *
 else:
     from .server_setting import *
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
