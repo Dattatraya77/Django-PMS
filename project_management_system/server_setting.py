@@ -1,16 +1,15 @@
 # Render server Postgres Database settings
 
-import dj_database_url
-from decouple import config
+import os
+
 
 DATABASES = {
     'default': {
         'ENGINE': 'django_tenants.postgresql_backend',
-        "NAME": 'PMS_DB',
-        'USER': 'postgres',
-        'PASSWORD': 'root',
-        'HOST': "localhost",
-        'PORT': "5432",
+        'NAME': os.environ['POSTGRES_DB'],
+        'USER': os.environ['POSTGRES_USER'],
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+        'HOST': os.environ['DB_HOST'],
+        'PORT': os.environ['DB_PORT'],
     }
 }
-

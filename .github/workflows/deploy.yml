@@ -1,0 +1,52 @@
+name: Django PMS CI/CD Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+
+        script: |
+          cd /home/ubuntu
+
+          if [ ! -d "Django-PMS" ]; then
+            git clone https://github.com/Dattatraya77/Django-PMS.git Django-PMS
+          fi
+
+          sudo chown -R ubuntu:ubuntu /home/ubuntu/Django-PMS
+
+          cd Django-PMS
+
+          git config --global --add safe.directory /home/ubuntu/Django-PMS
+
+          echo "Fetching Latest Code"
+          git fetch --all
+
+          echo "Reset to Latest Commit"
+          git reset --hard origin/master
+
+          echo "Pull Latest Code"
+          git pull origin master
+
+          echo "Restart Docker"
+          docker-compose down
+          docker-compose build
+          docker-compose up -d
+
+          docker system prune -f
