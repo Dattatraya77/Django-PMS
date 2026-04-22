@@ -38,7 +38,7 @@
 
 
     {% if title %}
-        <title>Welcome to DMS - {{ title }}</title>
+        <title>Welcome to PMS - {{ title }}</title>
     {% else %}
         <title>Welcome to Project Management System</title>
     {% endif %}
@@ -248,7 +248,7 @@
             </li>
         </ul>
         <span  style="font-size : 12px;"> Copyright © 2020-<script>document.write(new Date().getFullYear());</script>,
-            DMS Inc. ALL RIGHTS RESERVED
+            PMS Inc. ALL RIGHTS RESERVED
         </span>
     </div>
 </nav>
@@ -369,25 +369,25 @@
                         extend:    'copyHtml5',
                         text:      '<img src="/static/images/copy.png" width="20" height="20"/>',
                         titleAttr: 'Copy list to clipboard',
-                        title: 'DMS_Export_Text'
+                        title: 'PMS_Export_Text'
                     },
                     {
                         extend:    'excelHtml5',
                         text:      '<img src="/static/images/xls.png" width="20" height="20"/>',
                         titleAttr: 'Export list in Excel file format',
-                        title: 'DMS_Export_Excel'
+                        title: 'PMS_Export_Excel'
                     },
                     {
                         extend:    'csvHtml5',
                         text:      '<img src="/static/images/export-csv.png" width="20" height="20"/>',
                         titleAttr: 'Export list in CSV file format',
-                        title: 'DMS_Export_CSV'
+                        title: 'PMS_Export_CSV'
                     },
                     {
                         extend:    'pdfHtml5',
                         text:      '<img src="/static/images/pdf.png" width="20" height="20"/>',
                         titleAttr: 'Export list in PDF file format',
-                        title: 'DMS_Export_PDF',
+                        title: 'PMS_Export_PDF',
                         orientation: 'landscape',
                         pageSize: 'LEGAL',
                         exportOptions: {
